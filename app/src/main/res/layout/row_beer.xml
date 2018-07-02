@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:beer="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="150dp"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:padding="5dp"
+    android:layout_margin="15dp"
+    android:id="@+id/parentlayout"
+    >
+
+
+    <ImageView
+        android:id="@+id/beer_icon"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintTop_toTopOf="parent"
+        beer:srcCompat="@drawable/icon" />
+
+
+    <TextView
+        android:id="@+id/beer_alcohal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="TextView"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/colorPrimaryDark"
+        beer:layout_constraintTop_toBottomOf="@id/beer_icon"  />
+
+
+    <TextView
+        android:id="@+id/beer_abc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="TextView"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/colorPrimaryDark"
+        beer:layout_constraintTop_toBottomOf="@id/beer_alcohal" />
+
+
+    <TextView
+        android:id="@+id/beer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="TextView"
+        android:ellipsize="end"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        beer:layout_constraintTop_toBottomOf="@id/beer_abc" />
+</android.support.constraint.ConstraintLayout>
