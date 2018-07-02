@@ -25,7 +25,12 @@ public class BeerViewModel extends AndroidViewModel {
 
         if (beerList == null) {
             beerList = new MutableLiveData<ArrayList<BeerPOJO>>();
-            beerRepository.fetchBeers(beerList);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    beerRepository.fetchBeers(beerList);
+                }
+            }).start();
         }
         return beerList;
     }

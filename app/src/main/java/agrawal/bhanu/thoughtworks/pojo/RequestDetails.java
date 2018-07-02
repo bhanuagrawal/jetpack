@@ -1,8 +1,6 @@
-package agrawal.bhanu.thoughtworks;
+package agrawal.bhanu.thoughtworks.pojo;
 
-import org.json.JSONObject;
-
-class RequestDetails{
+public class RequestDetails{
     private String url;
     private int requestType;
     private String requestBody;

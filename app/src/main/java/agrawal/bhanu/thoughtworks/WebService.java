@@ -13,12 +13,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import agrawal.bhanu.thoughtworks.network.MyStringRequest;
+import agrawal.bhanu.thoughtworks.pojo.RequestDetails;
+
 public class WebService {
 
     @Inject RequestQueue mRequestQueue;
     Application application;
-    RequestDetails mRequestDetails;
-    HtttpResonseListner htttpResonseListner;
 
     public WebService(Application application) {
         this.application = application;
@@ -26,28 +27,12 @@ public class WebService {
 
     }
 
-    public void setHtttpResonseListner(HtttpResonseListner htttpResonseListner) {
-        this.htttpResonseListner = htttpResonseListner;
-    }
 
-    public void makeRequest(RequestDetails requestDetails){
+    public void makeRequest(final RequestDetails requestDetails, HtttpResonseListner resonseListner){
 
-        mRequestDetails = requestDetails;
-        StringRequest request = new StringRequest(mRequestDetails.getRequestType(), mRequestDetails.getUrl(),
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        htttpResonseListner.onSuccess(mRequestDetails, response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        htttpResonseListner.onError(mRequestDetails, error);
-                    }
-                }
-        ){
+        MyStringRequest request = new MyStringRequest(requestDetails, resonseListner){
+
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return super.getHeaders();
@@ -61,13 +46,14 @@ public class WebService {
             @Override
             public byte[] getBody() throws AuthFailureError {
                 try {
-                    return mRequestDetails.getRequestBody() == null ? null : mRequestDetails.getRequestBody().getBytes("utf-8");
+                    return requestDetails.getRequestBody() == null ? null : requestDetails.getRequestBody().getBytes("utf-8");
                 } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", mRequestDetails.getRequestBody(), "utf-8");
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestDetails.getRequestBody(), "utf-8");
                     return null;
                 }
             }
         };
+
 
         mRequestQueue.add(request);
 

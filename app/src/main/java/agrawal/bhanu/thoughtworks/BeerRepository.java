@@ -16,6 +16,7 @@ import java.util.Comparator;
 import javax.inject.Inject;
 
 import agrawal.bhanu.thoughtworks.pojo.BeerPOJO;
+import agrawal.bhanu.thoughtworks.pojo.RequestDetails;
 
 public class BeerRepository implements WebService.HtttpResonseListner{
     Application application;
@@ -31,13 +32,12 @@ public class BeerRepository implements WebService.HtttpResonseListner{
 
     public void fetchBeers(MutableLiveData<ArrayList<BeerPOJO>> beerList) {
         this.beerList = beerList;
-        RequestDetails requestDetails = new RequestDetails();
+        final RequestDetails requestDetails = new RequestDetails();
         requestDetails.setRequestBody(null);
         requestDetails.setUrl(Constants.BEER_LIST_REQUEST_URL);
         requestDetails.setRequestID(Constants.BEER_LIST_REQUEST);
         requestDetails.setRequestType(Request.Method.GET);
-        webService.setHtttpResonseListner(this);
-        webService.makeRequest(requestDetails);
+        webService.makeRequest(requestDetails, this);
     }
 
 
