@@ -12,47 +12,25 @@
     >
 
 
-    <ImageView
-        android:id="@+id/beer_icon"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        beer:layout_constraintLeft_toLeftOf="parent"
-        beer:layout_constraintTop_toTopOf="parent"
-        beer:srcCompat="@drawable/icon" />
-
-
     <TextView
-        android:id="@+id/beer_alcohal"
+        android:id="@+id/beer_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
         android:text="TextView"
-        beer:layout_constraintLeft_toLeftOf="parent"
         android:textColor="@color/colorPrimaryDark"
-        beer:layout_constraintTop_toBottomOf="@id/beer_icon"  />
-
+        android:textSize="15dp"
+        android:textStyle="bold"
+        beer:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
         android:id="@+id/beer_abc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:text="TextView"
-        beer:layout_constraintLeft_toLeftOf="parent"
         android:textColor="@color/colorPrimaryDark"
-        beer:layout_constraintTop_toBottomOf="@id/beer_alcohal" />
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintTop_toBottomOf="@id/beer_name" />
 
 
-    <TextView
-        android:id="@+id/beer_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="TextView"
-        android:ellipsize="end"
-        beer:layout_constraintLeft_toLeftOf="parent"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
-        android:textSize="15dp"
-        beer:layout_constraintTop_toBottomOf="@id/beer_abc" />
 </android.support.constraint.ConstraintLayout>

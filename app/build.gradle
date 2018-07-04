@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "agrawal.bhanu.thoughtworks"
+        applicationId "agrawal.bhanu.jetpack"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -36,4 +36,5 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     implementation 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'android.arch.paging:runtime:1.0.0-alpha6'
 }
