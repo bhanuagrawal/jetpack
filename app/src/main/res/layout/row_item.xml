@@ -14,7 +14,7 @@
 
     <TextView
         android:id="@+id/beer_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:text="TextView"
@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/beer_abc"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
         android:textColor="@color/colorPrimaryDark"

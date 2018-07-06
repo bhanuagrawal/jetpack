@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 public class PostDataSourceFactory implements android.arch.paging.DataSource.Factory {
 
-    @Inject
     ItemKeyedPostDataSource itemKeyedPostDataSource;
     @Inject
     Executor executor;
@@ -29,7 +28,12 @@ public class PostDataSourceFactory implements android.arch.paging.DataSource.Fac
 
     @Override
     public android.arch.paging.DataSource create() {
+        itemKeyedPostDataSource = new ItemKeyedPostDataSource(application, executor);
         mutableLiveData.postValue(itemKeyedPostDataSource);
         return itemKeyedPostDataSource;
     }
+
+
+
+
 }

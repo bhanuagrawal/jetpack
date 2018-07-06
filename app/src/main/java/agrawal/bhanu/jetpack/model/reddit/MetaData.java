@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.pojo.reddit;
+package agrawal.bhanu.jetpack.model.reddit;
 
 import java.io.Serializable;
 import java.util.ArrayList;

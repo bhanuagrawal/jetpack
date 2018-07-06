@@ -5,12 +5,9 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-
 import javax.inject.Inject;
 
-import agrawal.bhanu.jetpack.pojo.BeerPOJO;
-import agrawal.bhanu.jetpack.pojo.reddit.RedditFeed;
+import agrawal.bhanu.jetpack.model.reddit.RedditFeed;
 
 public class PostViewModel extends AndroidViewModel {
 

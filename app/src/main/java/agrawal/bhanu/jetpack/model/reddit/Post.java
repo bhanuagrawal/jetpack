@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.pojo.reddit;
+package agrawal.bhanu.jetpack.model.reddit;
 
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.DiffCallback;

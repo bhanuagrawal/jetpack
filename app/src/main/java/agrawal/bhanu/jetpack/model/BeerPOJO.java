@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.pojo;
+package agrawal.bhanu.jetpack.model;
 
 import java.io.Serializable;
 

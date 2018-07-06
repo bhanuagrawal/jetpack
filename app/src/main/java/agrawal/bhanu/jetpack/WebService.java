@@ -3,16 +3,14 @@ import android.app.Application;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-
+import com.android.volley.toolbox.StringRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-
 import javax.inject.Inject;
-
-import agrawal.bhanu.jetpack.network.MyStringRequest;
-import agrawal.bhanu.jetpack.pojo.RequestDetails;
+import agrawal.bhanu.jetpack.model.RequestDetails;
 
 public class WebService {
 
@@ -26,10 +24,27 @@ public class WebService {
     }
 
 
-    public void makeRequest(final RequestDetails requestDetails, HtttpResponseListner resonseListner){
+    public void makeRequest(final RequestDetails requestDetails, final HtttpResponseListner responseListner){
 
-        MyStringRequest request = new MyStringRequest(requestDetails, resonseListner){
+        if(requestDetails.getOnSuccess() == null){
+            requestDetails.setOnSuccess(new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    responseListner.onSuccess(requestDetails, response);
+                }
+            });
+        }
 
+        if(requestDetails.getOnError() == null){
+            requestDetails.setOnError(new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    responseListner.onError(requestDetails, error);
+                }
+            });
+        }
+
+        StringRequest request = new StringRequest(requestDetails.getRequestType(), requestDetails.getUrl(), requestDetails.getOnSuccess(), requestDetails.getOnError()){
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {

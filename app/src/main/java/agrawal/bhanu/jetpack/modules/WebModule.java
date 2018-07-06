@@ -11,6 +11,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
+import javax.inject.Scope;
 import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.ItemKeyedPostDataSource;
@@ -62,13 +63,7 @@ public class WebModule {
     }
 
     @Provides
-    @Inject
-    public ItemKeyedPostDataSource providesItemKeyedPostDataSource(Application application){
-        return new ItemKeyedPostDataSource(application);
-    }
-
-    @Provides
-    @Inject
+    @Singleton
     public Uri.Builder provideUrlBuilder(){
         return new Uri.Builder();
     }

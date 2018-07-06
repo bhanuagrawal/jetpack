@@ -1,7 +1,4 @@
-package agrawal.bhanu.jetpack.pojo.reddit;
-
-import android.support.annotation.NonNull;
-import android.support.v7.recyclerview.extensions.DiffCallback;
+package agrawal.bhanu.jetpack.model.reddit;
 
 import java.io.Serializable;
 
@@ -10,6 +7,16 @@ public class Data implements Serializable{
     private String title;
 
     private String id;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
 
     public String getId() {
         return id;

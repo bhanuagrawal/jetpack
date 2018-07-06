@@ -8,25 +8,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MyApp;
-import agrawal.bhanu.jetpack.PostViewModel;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.RedditPostViewModel;
 import agrawal.bhanu.jetpack.adapters.ItemsAdapter;
-import agrawal.bhanu.jetpack.pojo.BeerPOJO;
-import agrawal.bhanu.jetpack.pojo.NetworkState;
-import agrawal.bhanu.jetpack.pojo.reddit.Post;
-import agrawal.bhanu.jetpack.pojo.reddit.RedditFeed;
+import agrawal.bhanu.jetpack.model.NetworkState;
+import agrawal.bhanu.jetpack.model.reddit.Post;
 
 
 /**
@@ -53,6 +50,7 @@ public class ItemsList extends Fragment {
     private RecyclerView beerRV;
     @Inject
     ItemsAdapter itemsAdapter;
+    private SwipeRefreshLayout swifeToRefresh;
 
 
     public ItemsList() {
@@ -83,8 +81,10 @@ public class ItemsList extends Fragment {
             pageNo = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        postViewModel = ViewModelProviders.of(getActivity()).get(RedditPostViewModel.class);
 
+        ((MyApp)getActivity().getApplication()).getWebComponent().inject(this);
+
+        postViewModel = ViewModelProviders.of(getActivity()).get(RedditPostViewModel.class);
         final Observer<PagedList<Post>> postObserver = new Observer<PagedList<Post>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Post> pagedList) {
@@ -101,9 +101,25 @@ public class ItemsList extends Fragment {
             }
         };
 
+        postViewModel.getInitloading().observe(this, new Observer<NetworkState>() {
+            @Override
+            public void onChanged(@Nullable NetworkState networkState) {
+                if(networkState != null){
+                    swifeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
+                }
+
+            }
+        });
+
+
         postViewModel.getPostList().observe(this, postObserver);
-        //postViewModel.getNetworkState().observe(this, networkObserver);
-        ((MyApp)getActivity().getApplication()).getWebComponent().inject(this);
+        postViewModel.getNetworkState().observe(this, networkObserver);
+        itemsAdapter.setRetryCallback(new ItemsAdapter.RetryCallback() {
+            @Override
+            public void retry() {
+                postViewModel.retry();
+            }
+        });
     }
 
     @Override
@@ -111,8 +127,15 @@ public class ItemsList extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_beer_list, container, false);
         beerRV = (RecyclerView)view.findViewById(R.id.beerlist);
-        beerRV.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        beerRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         beerRV.setAdapter(itemsAdapter);
+        swifeToRefresh = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
+        swifeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                postViewModel.onRefresh();
+            }
+        });
         return view;
     }
 
