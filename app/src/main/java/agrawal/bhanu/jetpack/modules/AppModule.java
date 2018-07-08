@@ -1,9 +1,13 @@
 package agrawal.bhanu.jetpack.modules;
 
 import android.app.Application;
+import android.app.WallpaperManager;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
@@ -30,5 +34,18 @@ public class AppModule {
     public RequestQueue providesRequestQueue(Application application){
         return Volley.newRequestQueue(application.getApplicationContext());
 
+    }
+
+
+    @Provides
+    @Singleton
+    public WallpaperManager getWallpaperManager(Application application){
+        return WallpaperManager.getInstance(application.getApplicationContext());
+    }
+
+    @Provides
+    @Singleton
+    public Executor providesExecuter(){
+        return  Executors.newFixedThreadPool(5);
     }
 }

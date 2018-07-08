@@ -1,21 +1,19 @@
 package agrawal.bhanu.jetpack.components;
 import javax.inject.Singleton;
 
-import agrawal.bhanu.jetpack.ItemKeyedPostDataSource;
-import agrawal.bhanu.jetpack.PostDataSourceFactory;
-import agrawal.bhanu.jetpack.PostRepository;
-import agrawal.bhanu.jetpack.PostViewModel;
-import agrawal.bhanu.jetpack.RedditPostViewModel;
-import agrawal.bhanu.jetpack.fragments.ItemsList;
+import agrawal.bhanu.jetpack.reddit.data.ItemKeyedPostDataSource;
+import agrawal.bhanu.jetpack.reddit.data.PostDataSourceFactory;
+import agrawal.bhanu.jetpack.reddit.data.PostRepository;
+import agrawal.bhanu.jetpack.reddit.ui.RedditPostViewModel;
+import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 import agrawal.bhanu.jetpack.modules.AppModule;
-import agrawal.bhanu.jetpack.modules.WebModule;
-import agrawal.bhanu.jetpack.WebService;
+import agrawal.bhanu.jetpack.modules.NetworkModule;
+import agrawal.bhanu.jetpack.network.WebService;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {AppModule.class, WebModule.class})
+@Component(modules = {AppModule.class, NetworkModule.class})
 public interface WebComponent {
-    void inject(PostViewModel postViewModel);
     void inject(WebService webService);
     void inject(PostRepository postRepository);
     void inject(RedditPostViewModel redditPostViewModel);
