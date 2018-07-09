@@ -3,6 +3,7 @@ package agrawal.bhanu.jetpack.components;
 
 import javax.inject.Singleton;
 
+import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.modules.AppModule;
 import agrawal.bhanu.jetpack.modules.LocalDataModule;

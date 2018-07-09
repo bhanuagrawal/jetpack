@@ -47,4 +47,12 @@ public class AppsViewModel extends AndroidViewModel {
         return mCurrentApps;
     }
 
+    public void onAppListChange() {
+
+        if (mCurrentApps == null) {
+            mCurrentApps = new MutableLiveData<AppsInfo>();
+            mCurrentApps.setValue(new AppsInfo(0, 1, 0, new ArrayList<AppDTO>()));
+        }
+        appsRepository.fetchApps(mCurrentApps);
+    }
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
@@ -21,23 +22,25 @@ import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 
 public class AppsRepository {
 
+    private final PackageManager packageManager;
     Application application;
 
     public AppsRepository(Application application) {
         this.application = application;
+        packageManager = application.getPackageManager();
     }
 
     public void fetchApps(MutableLiveData<AppsInfo> mCurrentApps) {
 
         Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> pkgAppsList = application.getPackageManager().queryIntentActivities( mainIntent, 0);
+        List<ResolveInfo> pkgAppsList = packageManager.queryIntentActivities( mainIntent, 0);
         ArrayList<AppDTO> apps = new ArrayList<>();
         for(ResolveInfo app: pkgAppsList){
             AppDTO appDTO = new AppDTO();
-            appDTO.setAppName(app.loadLabel(application.getPackageManager()).toString());
+            appDTO.setAppName(app.loadLabel(packageManager).toString());
             appDTO.setAppPackage(app.activityInfo.packageName);
-            appDTO.setAppIcon(app.loadIcon(application.getPackageManager()));
+            appDTO.setAppIcon(app.loadIcon(packageManager));
             apps.add(appDTO);
         }
 
@@ -83,7 +86,7 @@ public class AppsRepository {
         float pixeldpi = Resources.getSystem().getDisplayMetrics().density;
         int itemWidth_dp = 80;
         float itemWidth_px = pixeldpi * itemWidth_dp;
-
+        //return  1;
         return (int)(width_px/itemWidth_px) -1;
     }
 

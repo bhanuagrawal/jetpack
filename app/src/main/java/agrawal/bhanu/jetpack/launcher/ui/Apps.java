@@ -75,7 +75,7 @@ public class Apps extends Fragment {
             position = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAppsModel = ViewModelProviders.of(this).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override

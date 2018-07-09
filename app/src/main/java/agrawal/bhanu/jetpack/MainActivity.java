@@ -2,7 +2,11 @@
 package agrawal.bhanu.jetpack;
 import android.Manifest;
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
@@ -14,8 +18,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import javax.inject.Inject;
+
+import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
+import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 
@@ -47,15 +55,18 @@ implements ItemsList.OnFragmentInteractionListener,
             }
         }
 
-/*        getSupportFragmentManager().
-                beginTransaction().
-                replace(R.id.fragment_container, ItemsList.newInstance(0, ""), MainActivity.BEER_DISPLAY_FRAGMENT).
-                commit();*/
-/*
-        getSupportFragmentManager().
-                beginTransaction().
-                replace(R.id.fragment_container, AppList.newInstance("", ""), MainActivity.APP_LIST_FRAGMENT).
-                commit();*/
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_INSTALL);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_INSTALL);
+        intentFilter.addDataScheme("package");
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onAppListChange();
+            }
+        }, intentFilter);
     }
 
     private void requestForSpecificPermission() {

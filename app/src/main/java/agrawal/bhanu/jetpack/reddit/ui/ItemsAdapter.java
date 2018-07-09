@@ -8,12 +8,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.reddit.model.Post;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder> {
 
@@ -111,16 +117,29 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView beerNameTV;
-        public TextView beerABCTv;
+
+        @BindView(R.id.title)
+        public TextView titleTV;
+
+        @BindView(R.id.free_text)
+        public TextView freeTextTv;
+
+        @BindView(R.id.subreddit)
+        public TextView subredditTV;
+
+        @BindView(R.id.upvotes)
+        public TextView upvotesTv;
+
+
+        @BindView(R.id.parentlayout)
         public ConstraintLayout parentLayout;
+
+        @BindView(R.id.image)
+        public ImageView imageView;
 
         public ItemViewHolder(View view) {
             super(view);
-            beerNameTV = (TextView) view.findViewById(R.id.beer_name);
-            beerABCTv = (TextView) view.findViewById(R.id.beer_abc);
-
-            parentLayout = (ConstraintLayout) view.findViewById(R.id.parentlayout);
+            ButterKnife.bind(this, view);
             parentLayout.setOnClickListener(this);
         }
 
@@ -129,9 +148,29 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
             int position = getAdapterPosition();
         }
 
-        public void bindTo(Post post) {
-            beerNameTV.setText(post.getData().getTitle());
-            beerABCTv.setText(post.getData().getSelftext());
+        public void bindTo(final Post post) {
+            titleTV.setText(post.getData().getTitle());
+            freeTextTv.setText(post.getData().getSelftext());
+            subredditTV.setText(post.getData().getSubreddit());
+            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvodes");
+            Picasso.get()
+                    .load(post.getData().getThumbnail()) // thumbnail url goes here
+                    .into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Picasso.get()
+                                    .load(post.getData().getUrl()) // image url goes here
+                                    .placeholder(imageView.getDrawable())
+                                    .into(imageView);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+
+                        }
+
+                    });
+            //Picasso.get().load(post.getData().getUrl()).into(imageView);
         }
 
     }
@@ -141,7 +180,6 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
         public TextView loadingTv;
         public TextView errorMsgTv;
         public TextView retryTv;
-
         public NetworkStateViewHolder(@NonNull View itemView) {
             super(itemView);
             loadingTv = (TextView) itemView.findViewById(R.id.loading);

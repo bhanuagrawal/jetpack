@@ -14,24 +14,60 @@
 
 
     <TextView
-        android:id="@+id/beer_name"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:text="TextView"
         android:textColor="#FFF"
-        android:textSize="15dp"
+        android:textSize="25dp"
         android:textStyle="bold"
         beer:layout_constraintLeft_toLeftOf="parent" />
 
+
     <TextView
-        android:id="@+id/beer_abc"
+        android:id="@+id/subreddit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
         android:textColor="#FFF"
+        android:textSize="12dp"
+        android:layout_margin="5dp"
         beer:layout_constraintLeft_toLeftOf="parent"
-        beer:layout_constraintTop_toBottomOf="@id/beer_name" />
+        beer:layout_constraintTop_toBottomOf="@id/title" />
+
+    <TextView
+        android:id="@+id/upvotes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="#FFF"
+        android:textSize="12dp"
+        android:layout_margin="5dp"
+        beer:layout_constraintLeft_toRightOf="@id/subreddit"
+        beer:layout_constraintTop_toBottomOf="@id/title" />
+
+
+    <TextView
+        android:id="@+id/free_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="#FFF"
+        android:textSize="20dp"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintTop_toBottomOf="@id/subreddit" />
+
+    <ImageView
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintRight_toRightOf="parent"
+        android:scaleType="fitCenter"
+        android:id="@+id/image"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        beer:layout_constraintTop_toBottomOf="@id/free_text"
+        beer:srcCompat="@android:color/transparent" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -8,6 +8,56 @@ public class Data implements Serializable{
 
     private String id;
 
+    private String url;
+
+    private int created_utc;
+
+    private String subreddit;
+
+    private int ups;
+
+    private String thumbnail;
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public int getCreated_utc() {
+        return created_utc;
+    }
+
+    public void setCreated_utc(int created_utc) {
+        this.created_utc = created_utc;
+    }
+
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
+    public int getUps() {
+        return ups;
+    }
+
+    public void setUps(int ups) {
+        this.ups = ups;
+    }
+
     public String getName() {
         return name;
     }
