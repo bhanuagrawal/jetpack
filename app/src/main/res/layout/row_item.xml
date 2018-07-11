@@ -6,10 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
-    android:padding="5dp"
-    android:layout_margin="15dp"
+    android:padding="10dp"
+    android:layout_margin="10dp"
     android:id="@+id/parentlayout"
-    android:background="#22000000"
+    android:background="#11000000"
     >
 
 
@@ -19,8 +19,8 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:text="TextView"
-        android:textColor="#FFF"
-        android:textSize="25dp"
+        android:textColor="#000"
+        android:textSize="20dp"
         android:textStyle="bold"
         beer:layout_constraintLeft_toLeftOf="parent" />
 
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textColor="#FFF"
+        android:textColor="#000"
         android:textSize="12dp"
         android:layout_margin="5dp"
         beer:layout_constraintLeft_toLeftOf="parent"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textColor="#FFF"
+        android:textColor="#000"
         android:textSize="12dp"
         android:layout_margin="5dp"
         beer:layout_constraintLeft_toRightOf="@id/subreddit"
@@ -53,8 +53,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textColor="#FFF"
-        android:textSize="20dp"
+        android:textColor="#000"
+        android:textSize="15dp"
         beer:layout_constraintLeft_toLeftOf="parent"
         beer:layout_constraintTop_toBottomOf="@id/subreddit" />
 

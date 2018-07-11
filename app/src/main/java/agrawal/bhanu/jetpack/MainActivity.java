@@ -24,6 +24,7 @@ import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
+import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 
@@ -31,11 +32,13 @@ public class MainActivity extends AppCompatActivity
 implements ItemsList.OnFragmentInteractionListener,
         AppList.OnFragmentInteractionListener,
         Apps.OnFragmentInteractionListener,
-        Home.OnFragmentInteractionListener{
+        Home.OnFragmentInteractionListener,
+        DefaultPage.OnFragmentInteractionListener{
 
     private static final String BEER_DISPLAY_FRAGMENT = "sfdfdg";
     private static final String APP_LIST_FRAGMENT = "APPS_FRAGMENT";
     private static final String HOME_FRAGMENT = "homefragment";
+    private BroadcastReceiver appListChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +64,13 @@ implements ItemsList.OnFragmentInteractionListener,
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_INSTALL);
         intentFilter.addDataScheme("package");
-        registerReceiver(new BroadcastReceiver() {
+        appListChangeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onAppListChange();
             }
-        }, intentFilter);
+        };
+        registerReceiver(appListChangeReceiver, intentFilter);
     }
 
     private void requestForSpecificPermission() {
@@ -92,5 +96,11 @@ implements ItemsList.OnFragmentInteractionListener,
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(appListChangeReceiver);
     }
 }

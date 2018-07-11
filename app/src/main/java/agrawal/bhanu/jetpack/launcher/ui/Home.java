@@ -73,7 +73,7 @@ public class Home extends Fragment {
         }
 
         adapter = new HomeViewPagerAdapter(getChildFragmentManager());
-        adapter.setNUM_ITEMS(2);
+        adapter.setNUM_ITEMS(3);
     }
 
     @Override
@@ -83,6 +83,7 @@ public class Home extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         uibinder = ButterKnife.bind(this, view);
         homeViewPager.setAdapter(adapter);
+        homeViewPager.setCurrentItem(1);
         return view;
     }
 
@@ -154,6 +155,8 @@ public class Home extends Fragment {
                 case 0:
                     return ItemsList.newInstance(0, "");
                 case 1:
+                    return DefaultPage.newInstance("", "");
+                case 2:
                     return AppList.newInstance("", "");
                 default:
                     return ItemsList.newInstance(0, "");

@@ -2,6 +2,8 @@ package agrawal.bhanu.jetpack.reddit.ui;
 
 import android.app.Application;
 import android.arch.paging.PagedListAdapter;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
@@ -146,13 +149,16 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.REDDIT_BASE_URL + getItem(position).getData().getPermalink()));
+            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mApplication.startActivity(browserIntent);
         }
 
         public void bindTo(final Post post) {
             titleTV.setText(post.getData().getTitle());
             freeTextTv.setText(post.getData().getSelftext());
             subredditTV.setText(post.getData().getSubreddit());
-            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvodes");
+            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvotes");
             Picasso.get()
                     .load(post.getData().getThumbnail()) // thumbnail url goes here
                     .into(imageView, new Callback() {
@@ -161,6 +167,7 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
                             Picasso.get()
                                     .load(post.getData().getUrl()) // image url goes here
                                     .placeholder(imageView.getDrawable())
+                                    .fit()
                                     .into(imageView);
                         }
 

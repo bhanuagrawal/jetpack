@@ -36,7 +36,7 @@ public class AppsViewModel extends AndroidViewModel {
 
         if (mCurrentApps == null) {
             mCurrentApps = new MutableLiveData<AppsInfo>();
-            mCurrentApps.setValue(new AppsInfo(0, 1, 0, new ArrayList<AppDTO>()));
+            mCurrentApps.setValue(new AppsInfo(0, 1, 0, new ArrayList<AppDTO>(), new ArrayList<AppDTO>()));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -51,7 +51,7 @@ public class AppsViewModel extends AndroidViewModel {
 
         if (mCurrentApps == null) {
             mCurrentApps = new MutableLiveData<AppsInfo>();
-            mCurrentApps.setValue(new AppsInfo(0, 1, 0, new ArrayList<AppDTO>()));
+            mCurrentApps.setValue(new AppsInfo(0, 1, 0, new ArrayList<AppDTO>(), new ArrayList<AppDTO>()));
         }
         appsRepository.fetchApps(mCurrentApps);
     }

@@ -19,11 +19,11 @@ import agrawal.bhanu.jetpack.network.WebService;
 import agrawal.bhanu.jetpack.reddit.model.RedditFeed;
 
 public class PostRepository implements WebService.HtttpResponseListner {
+
     Application application;
     @Inject WebService webService;
     @Inject Gson gson;
-    @Inject
-    Uri.Builder urlBuilder;
+    @Inject Uri.Builder urlBuilder;
 
 
     public PostRepository(Application application) {

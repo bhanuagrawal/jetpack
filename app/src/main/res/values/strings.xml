@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Crafts Beer</string>
+    <string name="app_name">Reddit Launcher</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_msg">Could not fetch posts !!</string>
 </resources>

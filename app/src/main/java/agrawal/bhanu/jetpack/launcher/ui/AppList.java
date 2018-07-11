@@ -1,5 +1,6 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
+import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -20,7 +21,10 @@ import android.view.animation.Interpolator;
 
 import java.lang.reflect.Field;
 
+import javax.inject.Inject;
+
 import agrawal.bhanu.jetpack.AppUtils;
+import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.util.FixedSpeedScroller;
@@ -48,6 +52,10 @@ public class AppList extends Fragment{
     private ViewPager appsViewPager;
     private AppsViewModel mAppsModel;
     private TabLayout tabLayout;
+
+
+    @Inject
+    WallpaperManager wallpaperManager;
 
     public AppList() {
         // Required empty public constructor
@@ -79,6 +87,7 @@ public class AppList extends Fragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAdapter = new MyAdapter(getChildFragmentManager());
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {

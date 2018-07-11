@@ -10,17 +10,17 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Loading" />
+        android:text="Loading.." />
 
 
     <TextView
         android:id="@+id/error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/loading"
+        android:text="Could not fetch posts"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Could load fetch posts" />
+        app:layout_constraintTop_toBottomOf="@id/loading" />
 
     <TextView
         android:id="@+id/retry"

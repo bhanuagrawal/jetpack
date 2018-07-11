@@ -1,46 +1,44 @@
-package agrawal.bhanu.jetpack.reddit.ui;
+package agrawal.bhanu.jetpack.launcher.ui;
 
 import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.AppUtils;
+import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.network.model.NetworkState;
-import agrawal.bhanu.jetpack.network.model.Status;
-import agrawal.bhanu.jetpack.reddit.model.Post;
+import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ItemsList.OnFragmentInteractionListener} interface
+ * {@link DefaultPage.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ItemsList#newInstance} factory method to
+ * Use the {@link DefaultPage#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ItemsList extends Fragment {
+public class DefaultPage extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -51,31 +49,21 @@ public class ItemsList extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private RedditPostViewModel postViewModel;
-    private int pageNo;
+    private AppsViewModel mAppsModel;
 
-    @BindView(R.id.itemlist)
-    RecyclerView itemRV;
+    @BindView(R.id.default_apps)
+    RecyclerView defaultApps;
 
-
-    @Inject
-    public ItemsAdapter itemsAdapter;
+    @BindView(R.id.layout)
+    ConstraintLayout layout;
 
     @Inject
     WallpaperManager wallpaperManager;
 
+    private AppsAdapter appsAdapter;
+    private LinearLayoutManager layoutManager;
 
-    @BindView(R.id.swiperefresh)
-    SwipeRefreshLayout swifeToRefresh;
-
-    @BindView(R.id.errorMSG)
-    TextView errorMsg;
-
-
-    private Unbinder uibinder;
-
-
-    public ItemsList() {
+    public DefaultPage() {
         // Required empty public constructor
     }
 
@@ -83,14 +71,15 @@ public class ItemsList extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
+     * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ItemsList.
+     * @return A new instance of fragment Apps.
      */
     // TODO: Rename and change types and number of parameters
-    public static ItemsList newInstance(int pageNo, String param2) {
-        ItemsList fragment = new ItemsList();
+    public static DefaultPage newInstance(String param1, String param2) {
+        DefaultPage fragment = new DefaultPage();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, pageNo);
+        args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -100,75 +89,34 @@ public class ItemsList extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            pageNo = getArguments().getInt(ARG_PARAM1);
+            mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-        ((MyApp)getActivity().getApplication()).getWebComponent().inject(this);
-
-        postViewModel = ViewModelProviders.of(getActivity()).get(RedditPostViewModel.class);
-        final Observer<PagedList<Post>> postObserver = new Observer<PagedList<Post>>() {
+        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        appsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.HOME);
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
-            public void onChanged(@Nullable final PagedList<Post> pagedList) {
-                itemsAdapter.submitList(pagedList);
+            public void onChanged(@Nullable final AppsInfo appsInfo) {
+                appsAdapter.setApps(appsInfo.getDefaultApps());
             }
         };
-
-
-        final Observer<NetworkState> networkObserver = new Observer<NetworkState>() {
-
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                itemsAdapter.setNetworkState(networkState);
-            }
-        };
-
-        postViewModel.getInitloading().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                if(networkState != null){
-                    swifeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
-                    itemRV.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
-                    errorMsg.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
-                }
-
-
-
-            }
-        });
-
-
-        postViewModel.getPostList().observe(this, postObserver);
-        postViewModel.getNetworkState().observe(this, networkObserver);
-        itemsAdapter.setRetryCallback(new ItemsAdapter.RetryCallback() {
-            @Override
-            public void retry() {
-                postViewModel.retry();
-            }
-        });
+        mAppsModel.getAppsInfo().observe(this, appsObserver);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-        uibinder = ButterKnife.bind(this, view);
-        itemRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        itemRV.setAdapter(itemsAdapter);
-        swifeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                postViewModel.onRefresh();
-            }
-        });
-
-/*
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.default_page, container, false);
+        ButterKnife.bind(this, view);
+        defaultApps.setLayoutManager(layoutManager);
+        defaultApps.setAdapter(appsAdapter);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
                 AppUtils.checkIfAlreadyhavePermission(getActivity().getApplication())) {
-            itemRV.setBackground(wallpaperManager.getDrawable());
+            layout.setBackground(wallpaperManager.getDrawable());
         }
-*/
-
         return view;
     }
 
@@ -209,11 +157,5 @@ public class ItemsList extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        uibinder.unbind();
     }
 }

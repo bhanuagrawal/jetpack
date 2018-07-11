@@ -41,7 +41,7 @@ public class Apps extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView appRV;
-    private AllAppsAdapter appAppsAdapter;
+    private AppsAdapter appAppsAdapter;
     private AppsViewModel mAppsModel;
     private int position;
     private GridLayoutManager layoutManager;
@@ -77,6 +77,7 @@ public class Apps extends Fragment {
         }
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.ALL_APPS);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {
@@ -95,7 +96,6 @@ public class Apps extends Fragment {
         View view = inflater.inflate(R.layout.fragment_apps, container, false);
         appRV = (RecyclerView)view.findViewById(R.id.applist);
         appRV.setLayoutManager(layoutManager);
-        appAppsAdapter = new AllAppsAdapter(getActivity(), new ArrayList<AppDTO>());
         appRV.setAdapter(appAppsAdapter);
         return view;
     }

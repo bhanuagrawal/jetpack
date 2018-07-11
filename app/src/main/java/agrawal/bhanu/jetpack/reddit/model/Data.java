@@ -18,6 +18,16 @@ public class Data implements Serializable{
 
     private String thumbnail;
 
+    private String permalink;
+
+    public String getPermalink() {
+        return permalink;
+    }
+
+    public void setPermalink(String permalink) {
+        this.permalink = permalink;
+    }
+
     public String getThumbnail() {
         return thumbnail;
     }
