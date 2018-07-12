@@ -3,14 +3,18 @@ package agrawal.bhanu.jetpack.launcher.ui;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 import butterknife.BindView;
@@ -25,7 +29,7 @@ import butterknife.Unbinder;
  * Use the {@link Home#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Home extends Fragment {
+public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -41,6 +45,8 @@ public class Home extends Fragment {
     @BindView(R.id.home_viewpager)
     ViewPager homeViewPager;
     private HomeViewPagerAdapter adapter;
+    private int pagerNo;
+    private int currentPage = 1;
 
     public Home() {
         // Required empty public constructor
@@ -65,6 +71,11 @@ public class Home extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -83,7 +94,14 @@ public class Home extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         uibinder = ButterKnife.bind(this, view);
         homeViewPager.setAdapter(adapter);
-        homeViewPager.setCurrentItem(1);
+        if(savedInstanceState != null &&
+                savedInstanceState.containsKey("currentPage")){
+
+            Log.d("currentPageReceived", String.valueOf(savedInstanceState.getInt("currentPage")));
+            currentPage = savedInstanceState.getInt("currentPage");
+        }
+        homeViewPager.setCurrentItem(currentPage);
+        homeViewPager.addOnPageChangeListener(this);
         return view;
     }
 
@@ -93,6 +111,16 @@ public class Home extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d("currentPage", String.valueOf(homeViewPager.getCurrentItem()));
+        outState.putInt("currentPage", homeViewPager.getCurrentItem());
+    }
+
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -105,10 +133,26 @@ public class Home extends Fragment {
         }
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPageScrolled(int i, float v, int i1) {
+        mListener.onFragmentCreated(adapter.getItem(i));
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
     }
 
     /**
@@ -124,6 +168,7 @@ public class Home extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void onFragmentCreated(Fragment fragment);
     }
 
     @Override

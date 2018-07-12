@@ -87,6 +87,7 @@ public class AppList extends Fragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+
         ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAdapter = new MyAdapter(getChildFragmentManager());
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
@@ -169,6 +170,7 @@ public class AppList extends Fragment{
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void onFragmentCreated(Fragment fragment);
     }
 
     public static class MyAdapter extends FragmentStatePagerAdapter {

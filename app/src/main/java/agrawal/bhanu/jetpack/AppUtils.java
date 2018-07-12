@@ -12,8 +12,8 @@ import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 
 public class AppUtils {
 
-    public static ArrayList<AppDTO> getApps(AppsInfo appsInfo, int position) {
-        return new ArrayList<AppDTO>(appsInfo.getApps().subList(position * appsInfo.getApps_per_page(), appsInfo.getApps().size() > position * appsInfo.getApps_per_page() + appsInfo.getApps_per_page() ? position * appsInfo.getApps_per_page() + appsInfo.getApps_per_page() : appsInfo.getApps().size()));
+    public static ArrayList<AppDTO> getApps(AppsInfo appsInfo, int apps_per_page, int position) {
+        return new ArrayList<AppDTO>(appsInfo.getApps().subList(position * apps_per_page, appsInfo.getApps().size() > position * apps_per_page + apps_per_page ? position * apps_per_page + apps_per_page : appsInfo.getApps().size()));
     }
 
     public static int getNoOfPages(AppsInfo appsInfo) {

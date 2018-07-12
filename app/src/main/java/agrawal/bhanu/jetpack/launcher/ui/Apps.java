@@ -81,9 +81,9 @@ public class Apps extends Fragment {
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {
-                layoutManager.setSpanCount(mAppsModel.getAppsInfo().getValue().getColumn_count());
+                layoutManager.setSpanCount(mAppsModel.getColumn_count());
                 appRV.setLayoutManager(layoutManager);
-                appAppsAdapter.setApps(AppUtils.getApps(appsInfo, position));
+                appAppsAdapter.setApps(AppUtils.getApps(appsInfo, mAppsModel.getAppsCountPerPage(), position));
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
@@ -137,5 +137,6 @@ public class Apps extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void onFragmentCreated(Fragment fragment);
     }
 }

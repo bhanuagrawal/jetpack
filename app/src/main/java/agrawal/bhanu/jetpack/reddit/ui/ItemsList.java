@@ -57,19 +57,17 @@ public class ItemsList extends Fragment {
     @BindView(R.id.itemlist)
     RecyclerView itemRV;
 
-
     @Inject
     public ItemsAdapter itemsAdapter;
 
     @Inject
     WallpaperManager wallpaperManager;
 
+    @BindView(R.id.errorMSG)
+    TextView errorMsg;
 
     @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swifeToRefresh;
-
-    @BindView(R.id.errorMSG)
-    TextView errorMsg;
 
 
     private Unbinder uibinder;
@@ -130,9 +128,8 @@ public class ItemsList extends Fragment {
                     swifeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
                     itemRV.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
                     errorMsg.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
+
                 }
-
-
 
             }
         });
@@ -155,6 +152,7 @@ public class ItemsList extends Fragment {
         uibinder = ButterKnife.bind(this, view);
         itemRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         itemRV.setAdapter(itemsAdapter);
+        swifeToRefresh = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
         swifeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -209,6 +207,7 @@ public class ItemsList extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void onFragmentCreated(Fragment fragment);
     }
 
     @Override

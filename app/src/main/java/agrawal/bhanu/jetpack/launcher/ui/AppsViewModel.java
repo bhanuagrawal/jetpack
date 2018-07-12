@@ -55,4 +55,12 @@ public class AppsViewModel extends AndroidViewModel {
         }
         appsRepository.fetchApps(mCurrentApps);
     }
+
+    public int getAppsCountPerPage() {
+        return appsRepository.getAppRowCount()*appsRepository.getAppColumnCount();
+    }
+
+    public int getColumn_count() {
+        return appsRepository.getAppColumnCount();
+    }
 }

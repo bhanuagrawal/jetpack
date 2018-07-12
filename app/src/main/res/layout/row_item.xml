@@ -7,9 +7,9 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:padding="10dp"
-    android:layout_margin="10dp"
+    android:layout_margin="15dp"
     android:id="@+id/parentlayout"
-    android:background="#11000000"
+    android:background="#15000000"
     >
 
 
