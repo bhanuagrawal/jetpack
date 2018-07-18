@@ -1,30 +1,22 @@
 
 package agrawal.bhanu.jetpack;
 import android.Manifest;
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Window;
+import android.util.Log;
 import android.view.WindowManager;
 
-import javax.inject.Inject;
-
-import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
@@ -42,7 +34,7 @@ implements ItemsList.OnFragmentInteractionListener,
     private static final String BEER_DISPLAY_FRAGMENT = "sfdfdg";
     private static final String APP_LIST_FRAGMENT = "APPS_FRAGMENT";
     private static final String HOME_FRAGMENT = "homefragment";
-    private BroadcastReceiver appListChangeReceiver;
+    private BroadcastReceiver receiver;
     private Fragment homeFragment;
 
     @Override
@@ -75,14 +67,23 @@ implements ItemsList.OnFragmentInteractionListener,
         intentFilter.addAction(Intent.ACTION_PACKAGE_INSTALL);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_INSTALL);
+        intentFilter.addAction(Intent.ACTION_WALLPAPER_CHANGED);
+        intentFilter.addAction(Intent.ACTION_SET_WALLPAPER);
         intentFilter.addDataScheme("package");
-        appListChangeReceiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onAppListChange();
+                Log.d("wallpapeer", "changes");
+                if(intent.getAction() == Intent.ACTION_WALLPAPER_CHANGED){
+                    ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onWallpaperChange();
+                }
+                else{
+                    ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onAppListChange();
+                }
+
             }
         };
-        registerReceiver(appListChangeReceiver, intentFilter);
+        registerReceiver(receiver, intentFilter);
     }
 
     private void requestForSpecificPermission() {
@@ -94,6 +95,24 @@ implements ItemsList.OnFragmentInteractionListener,
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(HOME_FRAGMENT);
+        if(fragment != null &&
+                fragment.isVisible()){
+            ((Home)fragment).onBackPressed();
+        }
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+
 
     @Override
     public void onFragmentCreated(Fragment fragment) {
@@ -129,6 +148,6 @@ implements ItemsList.OnFragmentInteractionListener,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(appListChangeReceiver);
+        unregisterReceiver(receiver);
     }
 }

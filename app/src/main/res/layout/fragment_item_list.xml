@@ -22,14 +22,35 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <TextView
-        android:id="@+id/errorMSG"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/error_layout"
         android:layout_gravity="center"
-        android:textColor="#000"
         android:visibility="gone"
-        android:text="@string/error_msg" />
+        >
+
+        <TextView
+            android:id="@+id/errorMSG"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:layout_centerHorizontal="true"
+            android:text="@string/error_msg" />
+
+        <TextView
+            android:id="@+id/retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/errorMSG"
+            android:layout_centerHorizontal="true"
+            android:textColor="#000"
+            android:clickable="true"
+            android:text="Retry" />
+
+    </RelativeLayout>
+
+
 
 
 

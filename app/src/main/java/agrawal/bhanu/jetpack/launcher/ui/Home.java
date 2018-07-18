@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
@@ -46,7 +47,7 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     ViewPager homeViewPager;
     private HomeViewPagerAdapter adapter;
     private int pagerNo;
-    private int currentPage = 1;
+    private int currentPage = Constants.DEFAULT_PAGE_POSITION;
 
     public Home() {
         // Required empty public constructor
@@ -153,6 +154,10 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     @Override
     public void onPageScrollStateChanged(int i) {
 
+    }
+
+    public void onBackPressed() {
+        homeViewPager.setCurrentItem(Constants.DEFAULT_PAGE_POSITION, true);
     }
 
     /**

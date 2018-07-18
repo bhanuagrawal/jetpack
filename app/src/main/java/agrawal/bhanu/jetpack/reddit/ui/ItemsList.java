@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import javax.inject.Inject;
@@ -66,8 +67,14 @@ public class ItemsList extends Fragment {
     @BindView(R.id.errorMSG)
     TextView errorMsg;
 
+    @BindView(R.id.error_layout)
+    RelativeLayout errorLayout;
+
     @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swifeToRefresh;
+
+    @BindView(R.id.retry)
+    TextView retry;
 
 
     private Unbinder uibinder;
@@ -127,7 +134,7 @@ public class ItemsList extends Fragment {
                 if(networkState != null){
                     swifeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
                     itemRV.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
-                    errorMsg.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
+                    errorLayout.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
 
                 }
 
@@ -156,6 +163,12 @@ public class ItemsList extends Fragment {
         swifeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                postViewModel.onRefresh();
+            }
+        });
+        retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 postViewModel.onRefresh();
             }
         });

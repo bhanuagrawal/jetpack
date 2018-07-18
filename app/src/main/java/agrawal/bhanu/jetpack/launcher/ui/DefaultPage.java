@@ -4,6 +4,7 @@ import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
 
 import java.util.ArrayList;
 
@@ -31,7 +33,6 @@ import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -59,8 +60,6 @@ public class DefaultPage extends Fragment {
     @BindView(R.id.layout)
     ConstraintLayout layout;
 
-    @Inject
-    WallpaperManager wallpaperManager;
 
     private AppsAdapter appsAdapter;
     private LinearLayoutManager layoutManager;
@@ -106,6 +105,14 @@ public class DefaultPage extends Fragment {
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
+        mAppsModel.getWallpaper().observe(this, new Observer<Drawable>() {
+            @Override
+            public void onChanged(@Nullable Drawable drawable) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    layout.setBackground(drawable);
+                }
+            }
+        });
     }
 
     @Override
@@ -116,10 +123,6 @@ public class DefaultPage extends Fragment {
         ButterKnife.bind(this, view);
         defaultApps.setLayoutManager(layoutManager);
         defaultApps.setAdapter(appsAdapter);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
-                AppUtils.checkIfAlreadyhavePermission(getActivity().getApplication())) {
-            layout.setBackground(wallpaperManager.getDrawable());
-        }
         return view;
     }
 
