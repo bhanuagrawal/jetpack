@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -20,11 +21,13 @@ import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.reddit.model.Data;
 
 public class AppsViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
     private MutableLiveData<Drawable> wallpaper;
+    private MutableLiveData<ArrayList<AppDTO>> appSuggestions;
     private Application application;
     @Inject
     AppsRepository appsRepository;
@@ -92,4 +95,13 @@ public class AppsViewModel extends AndroidViewModel {
         return wallpaper;
     }
 
+    public void onAppSelected(AppDTO app) {
+        app.setClicks(app.getClicks() + 1);
+        app.setLastUsed(new Date());
+        saveAppsUsageInfo();
+    }
+
+    public void saveAppsUsageInfo() {
+        appsRepository.saveAppsUsageInfo(getAppsInfo().getValue().getApps());
+    }
 }

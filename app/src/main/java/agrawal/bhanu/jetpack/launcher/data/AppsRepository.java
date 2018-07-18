@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
@@ -15,11 +16,18 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import javax.inject.Inject;
+
+import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.internal.Utils;
@@ -28,11 +36,14 @@ import butterknife.internal.Utils;
 public class AppsRepository {
 
     private final PackageManager packageManager;
+    @Inject Gson gson;
+    @Inject SharedPreferences sharedPreferences;
     Application application;
 
     public AppsRepository(Application application) {
         this.application = application;
         packageManager = application.getPackageManager();
+        ((MyApp)application).getLocalDataComponent().inject(this);
     }
 
     public void fetchApps(MutableLiveData<AppsInfo> mCurrentApps) {
@@ -41,11 +52,17 @@ public class AppsRepository {
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> pkgAppsList = packageManager.queryIntentActivities( mainIntent, 0);
         ArrayList<AppDTO> apps = new ArrayList<>();
+        ArrayList<AppDTO> appsUsageInfo = getAppUsageInfo();
         for(ResolveInfo app: pkgAppsList){
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(app.loadLabel(packageManager).toString());
             appDTO.setAppPackage(app.activityInfo.packageName);
             appDTO.setAppIcon(app.loadIcon(packageManager));
+            AppDTO appUsage = getAppFromPackage(appsUsageInfo, app.activityInfo.packageName);
+            if(appUsage != null){
+                appDTO.setClicks(appUsage.getClicks());
+                appDTO.setLastUsed(appUsage.getLastUsed());
+            }
             apps.add(appDTO);
         }
 
@@ -89,6 +106,11 @@ public class AppsRepository {
 
         mCurrentApps.postValue(appsInfo);
 
+    }
+
+
+    private ArrayList<AppDTO> getAppUsageInfo() {
+        return gson.fromJson(sharedPreferences.getString("apps", "[]"), new TypeToken<ArrayList<AppDTO>>(){}.getType());
     }
 
     private AppDTO getDefaultCallApp(Intent intent) {
@@ -200,4 +222,22 @@ public class AppsRepository {
         return (int)(width_px/itemWidth_px) -1;
     }
 
+    public void saveAppsUsageInfo(ArrayList<AppDTO> apps) {
+
+        ArrayList<AppDTO> appsInfo = new ArrayList<>();
+        for(AppDTO app: apps){
+            appsInfo.add(new AppDTO(app));
+        }
+
+        sharedPreferences.edit().putString("apps", gson.toJson(appsInfo)).commit();
+    }
+
+    public AppDTO getAppFromPackage(ArrayList<AppDTO> apps, String appPackage) {
+        for(AppDTO appDTO: apps){
+            if(appDTO.getAppPackage().equals(appPackage)){
+                return appDTO;
+            }
+        }
+        return null;
+    }
 }

@@ -28,12 +28,6 @@ public class NetworkModule {
         return  new PostRepository(application);
     }
 
-    @Provides
-    @Singleton
-    public Gson providesGson(){
-        return new Gson();
-    }
-
 
     @Provides
     @Singleton

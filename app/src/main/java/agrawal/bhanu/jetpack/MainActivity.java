@@ -12,6 +12,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ implements ItemsList.OnFragmentInteractionListener,
     private static final String HOME_FRAGMENT = "homefragment";
     private BroadcastReceiver receiver;
     private Fragment homeFragment;
+    private AppsViewModel mAppsModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ implements ItemsList.OnFragmentInteractionListener,
             homeFragment = Home.newInstance("", "");
         }
 
+        mAppsModel = ViewModelProviders.of(this).get(AppsViewModel.class);
         int MyVersion = Build.VERSION.SDK_INT;
         if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (!AppUtils.checkIfAlreadyhavePermission(getApplication())) {

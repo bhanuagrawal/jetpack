@@ -2,9 +2,11 @@ package agrawal.bhanu.jetpack.modules;
 
 import android.app.Application;
 import android.app.WallpaperManager;
+import android.content.SharedPreferences;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -45,7 +47,20 @@ public class AppModule {
 
     @Provides
     @Singleton
+    public Gson providesGson(){
+        return new Gson();
+    }
+
+    @Provides
+    @Singleton
     public Executor providesExecuter(){
         return  Executors.newFixedThreadPool(5);
+    }
+
+    @Provides
+    @Singleton
+    public SharedPreferences provideSharedPreferences(Application application){
+        return application.getSharedPreferences("launcher", application.MODE_PRIVATE);
+
     }
 }

@@ -3,7 +3,7 @@ package agrawal.bhanu.jetpack.components;
 
 import javax.inject.Singleton;
 
-import agrawal.bhanu.jetpack.MainActivity;
+import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
@@ -16,5 +16,6 @@ import dagger.Component;
 public interface LocalDataComponent {
     void inject(AppsViewModel appsViewModel);
     void inject(DefaultPage defaultPage);
+    void inject(AppsRepository appsRepository);
     void inject(AppList appList);
 }

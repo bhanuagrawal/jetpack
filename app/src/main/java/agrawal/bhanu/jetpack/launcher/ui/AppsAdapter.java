@@ -1,10 +1,12 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import agrawal.bhanu.jetpack.R;
 public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder> {
 
     private final Context context;
+    private final AppsViewModel mAppsModel;
     private ArrayList<AppDTO> apps;
     public static final int HOME = 0;
     public static final int ALL_APPS = 1;
@@ -39,6 +42,7 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
         this.context = context;
         this.apps = apps;
         this.viewType = viewType;
+        mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(AppsViewModel.class);
     }
 
     public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -77,6 +81,7 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
                 if(intent == null){
                     throw new PackageManager.NameNotFoundException();
                 }else{
+                    mAppsModel.onAppSelected(apps.get(position));
                     context.startActivity(intent);
                 }
             }catch(PackageManager.NameNotFoundException e){
