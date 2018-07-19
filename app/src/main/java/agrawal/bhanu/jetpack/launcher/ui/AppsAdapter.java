@@ -26,6 +26,7 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
     private ArrayList<AppDTO> apps;
     public static final int HOME = 0;
     public static final int ALL_APPS = 1;
+    public static final int FOLDER = 2;
     private int viewType;
 
 
@@ -56,19 +57,22 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
         public AppViewHolder(View view, int viewType) {
             super(view);
             appNameTV = (TextView) view.findViewById(R.id.app_name);
-            appNameTV.setVisibility(viewType == HOME? View.GONE: View.VISIBLE);
+            appNameTV.setVisibility(viewType == ALL_APPS? View.VISIBLE: View.GONE);
             appIconIV = (ImageView) view.findViewById(R.id.app_icon);
             parentLayout = (ConstraintLayout) view.findViewById(R.id.parentlayout);
-            parentLayout.setOnClickListener(this);
-            parentLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    int position = getAdapterPosition();
-                    intent.setData(Uri.parse("package:" + apps.get(position).getAppPackage()));
-                    context.startActivity(intent);
-                    return true;
-                }
-            });
+            if(viewType != FOLDER){
+                parentLayout.setOnClickListener(this);
+                parentLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        int position = getAdapterPosition();
+                        intent.setData(Uri.parse("package:" + apps.get(position).getAppPackage()));
+                        context.startActivity(intent);
+                        return true;
+                    }
+                });
+            }
+
         }
 
         @Override
@@ -100,10 +104,30 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
     @Override
     public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
+        View itemView;
 
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(viewType==HOME? R.layout.row_app_home : R.layout.row_app, parent, false);
-        return new AppViewHolder(itemView, viewType);
+        switch (viewType){
+            case ALL_APPS:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_app, parent, false);
+                return new AppViewHolder(itemView, viewType);
+            case HOME:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_app_home, parent, false);
+                return new AppViewHolder(itemView, viewType);
+            case FOLDER:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_app_folder, parent, false);
+                return new AppViewHolder(itemView, viewType);
+            default:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_app, parent, false);
+                return new AppViewHolder(itemView, viewType);
+
+        }
+
+
+
 
     }
 

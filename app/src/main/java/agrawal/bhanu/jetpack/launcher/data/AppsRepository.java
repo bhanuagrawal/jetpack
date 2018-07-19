@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -239,5 +240,29 @@ public class AppsRepository {
             }
         }
         return null;
+    }
+
+
+    public ArrayList<AppDTO> fetchAppSuggestions(AppsInfo appsInfo) {
+        ArrayList<AppDTO> suggestion = new ArrayList<>();
+        for(AppDTO appDTO: appsInfo.getApps()){
+
+            if(appDTO.getLastUsed() != null){
+                long diffHours = (new Date().getTime() - appDTO.getLastUsed().getTime())/ (60 * 60 * 1000);
+                if(diffHours <= 24){
+                    suggestion.add(appDTO);
+                }
+            }
+
+        }
+
+        Collections.sort(suggestion, new Comparator<AppDTO>() {
+            @Override
+            public int compare(AppDTO appDTO, AppDTO t1) {
+                return t1.getClicks()-appDTO.getClicks();
+            }
+        });
+
+        return suggestion;
     }
 }

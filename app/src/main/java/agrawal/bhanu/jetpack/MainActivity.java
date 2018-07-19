@@ -20,6 +20,8 @@ import android.view.WindowManager;
 
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
+import agrawal.bhanu.jetpack.launcher.ui.AppsFolder;
+import agrawal.bhanu.jetpack.launcher.ui.AppsFolderDialogFragmnet;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
@@ -30,11 +32,15 @@ implements ItemsList.OnFragmentInteractionListener,
         AppList.OnFragmentInteractionListener,
         Apps.OnFragmentInteractionListener,
         Home.OnFragmentInteractionListener,
-        DefaultPage.OnFragmentInteractionListener{
+        DefaultPage.OnFragmentInteractionListener,
+        AppsFolder.OnFragmentInteractionListener,
+        AppsFolderDialogFragmnet.OnFragmentInteractionListener{
 
     private static final String BEER_DISPLAY_FRAGMENT = "sfdfdg";
     private static final String APP_LIST_FRAGMENT = "APPS_FRAGMENT";
     private static final String HOME_FRAGMENT = "homefragment";
+    public static final String FREQUENT_APPS = "frequentFragment";
+    public static final String APPS_DIALOG = "appsdialog";
     private BroadcastReceiver receiver;
     private Fragment homeFragment;
     private AppsViewModel mAppsModel;

@@ -1,77 +1,63 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
-import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.webkit.WebView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
-import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MainActivity;
-import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
-import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DefaultPage.OnFragmentInteractionListener} interface
+ * {@link AppsFolder.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DefaultPage#newInstance} factory method to
+ * Use the {@link AppsFolder#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DefaultPage extends Fragment {
+public class AppsFolder extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String folderName;
+    private String folderId;
 
     private OnFragmentInteractionListener mListener;
+    private RecyclerView appRV;
+    private AppsAdapter appAppsAdapter;
     private AppsViewModel mAppsModel;
+    private GridLayoutManager layoutManager;
 
-    @BindView(R.id.default_apps)
-    RecyclerView defaultApps;
+    @BindView(R.id.folderLayout)
+    RelativeLayout folderLayout;
 
-    @BindView(R.id.layout)
-    ConstraintLayout layout;
-
-    @BindView(R.id.folderContainer)
-    FrameLayout frequentAppContainer;
+    @BindView(R.id.folderName)
+    TextView folderNameTv;
 
 
-    private AppsAdapter appsAdapter;
-    private LinearLayoutManager layoutManager;
-    private Fragment frequentApps;
+    private Unbinder uibinder;
 
-    public DefaultPage() {
+    public AppsFolder() {
         // Required empty public constructor
     }
 
@@ -84,8 +70,8 @@ public class DefaultPage extends Fragment {
      * @return A new instance of fragment Apps.
      */
     // TODO: Rename and change types and number of parameters
-    public static DefaultPage newInstance(String param1, String param2) {
-        DefaultPage fragment = new DefaultPage();
+    public static AppsFolder newInstance(String param1, String param2) {
+        AppsFolder fragment = new AppsFolder();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -97,65 +83,36 @@ public class DefaultPage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            folderName = getArguments().getString(ARG_PARAM1);
+            folderId = getArguments().getString(ARG_PARAM2);
         }
 
-        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
-        appsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.HOME);
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        if (savedInstanceState != null) {
-            frequentApps = getChildFragmentManager().getFragment(savedInstanceState, MainActivity.FREQUENT_APPS);
-        }
-        else{
-            frequentApps = AppsFolder.newInstance("Frequent Apps", MainActivity.FREQUENT_APPS);
-        }
-
-        final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
-            @Override
-            public void onChanged(@Nullable final AppsInfo appsInfo) {
-                appsAdapter.setApps(appsInfo.getDefaultApps());
-            }
-        };
-        mAppsModel.getAppsInfo().observe(this, appsObserver);
-        mAppsModel.getWallpaper().observe(this, new Observer<Drawable>() {
-            @Override
-            public void onChanged(@Nullable Drawable drawable) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    layout.setBackground(drawable);
-                }
-            }
-        });
-
-
-        getChildFragmentManager().
-                beginTransaction().
-                replace(R.id.folderContainer, frequentApps, MainActivity.FREQUENT_APPS).
-                commit();
-
+        layoutManager = new GridLayoutManager(getActivity(), 1);
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER);
         mAppsModel.getAppSuggestions().observe(this, new Observer<ArrayList<AppDTO>>() {
             @Override
             public void onChanged(@Nullable ArrayList<AppDTO> apps) {
-                frequentAppContainer.setVisibility(apps.isEmpty()?View.GONE:View.VISIBLE);
+                layoutManager.setSpanCount(2);
+                appRV.setLayoutManager(layoutManager);
+                appAppsAdapter.setApps(apps);
             }
         });
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        getChildFragmentManager().putFragment(outState, MainActivity.FREQUENT_APPS, frequentApps);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.default_page, container, false);
-        ButterKnife.bind(this, view);
-        defaultApps.setLayoutManager(layoutManager);
-        defaultApps.setAdapter(appsAdapter);
+        View view = inflater.inflate(R.layout.apps_folder, container, false);
+        uibinder = ButterKnife.bind(this, view);
+        appRV = (RecyclerView)view.findViewById(R.id.applist);
+        appRV.setLayoutManager(layoutManager);
+        appRV.setAdapter(appAppsAdapter);
+        appRV.setLayoutFrozen(true);
+        folderLayout.setOnClickListener(this);
+        folderNameTv.setText(folderName);
         return view;
     }
 
@@ -183,6 +140,18 @@ public class DefaultPage extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        uibinder.unbind();
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        AppsFolderDialogFragmnet appsDialog = AppsFolderDialogFragmnet.newInstance("", "");
+        appsDialog.show(getChildFragmentManager(), MainActivity.APPS_DIALOG);
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
