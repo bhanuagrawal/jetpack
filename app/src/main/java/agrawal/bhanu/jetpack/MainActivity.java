@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,8 +20,8 @@ import android.view.WindowManager;
 
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
-import agrawal.bhanu.jetpack.launcher.ui.AppsFolder;
-import agrawal.bhanu.jetpack.launcher.ui.AppsFolderDialogFragmnet;
+import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
+import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolderDialogFragmnet;
 import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;

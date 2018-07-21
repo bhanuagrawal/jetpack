@@ -1,7 +1,6 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.folder;
 
 import android.app.Dialog;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +22,8 @@ import java.util.ArrayList;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
+import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

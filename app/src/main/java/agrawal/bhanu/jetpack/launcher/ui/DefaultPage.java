@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +24,10 @@ import java.util.ArrayList;
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.FolderView;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
+import agrawal.bhanu.jetpack.launcher.ui.folder.Folder;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 /**
@@ -104,6 +104,7 @@ public class DefaultPage extends Fragment {
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {
+                folderView.setVisibility(mAppsModel.getAppsByFolderId(MainActivity.FREQUENT_APPS).isEmpty()?View.GONE:View.VISIBLE);
                 appsAdapter.setApps(appsInfo.getDefaultApps());
             }
         };

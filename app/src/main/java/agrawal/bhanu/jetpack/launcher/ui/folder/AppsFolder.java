@@ -1,10 +1,7 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.folder;
 
-import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
@@ -27,6 +24,8 @@ import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
+import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -109,6 +108,7 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
         mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable AppsInfo appsInfo) {
+
                 appRV.setLayoutFrozen(false);
                 layoutManager.setSpanCount(2);
                 appRV.setLayoutManager(layoutManager);
