@@ -2,59 +2,33 @@ package agrawal.bhanu.jetpack.launcher.ui;
 
 import android.app.Application;
 import android.app.WallpaperManager;
-import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.view.animation.Transformation;
-import android.widget.Toast;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.AppUtils;
-import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
-import agrawal.bhanu.jetpack.network.model.NetworkState;
-import agrawal.bhanu.jetpack.reddit.data.ItemKeyedPostDataSource;
-import agrawal.bhanu.jetpack.reddit.model.Data;
 
 public class AppsViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
     private MutableLiveData<Drawable> wallpaper;
-    private LiveData<ArrayList<AppDTO>> appSuggestions;
     private Application application;
     @Inject
     AppsRepository appsRepository;
 
-    public LiveData<ArrayList<AppDTO>> getAppSuggestions() {
-
-        if(appSuggestions == null){
-            appSuggestions = Transformations.map(mCurrentApps, new Function<AppsInfo, ArrayList<AppDTO>>() {
-                @Override
-                public ArrayList<AppDTO> apply(final AppsInfo input) {
-                    return appsRepository.fetchAppSuggestions(input);
-                }
-            });
-        }
-        return appSuggestions;
-
-    }
 
     @Inject
     Executor executor;
@@ -123,6 +97,7 @@ public class AppsViewModel extends AndroidViewModel {
         app = appsRepository.getAppFromPackage(getAppsInfo().getValue().getApps(), app.getAppPackage());
         app.setClicks(app.getClicks() + 1);
         app.setLastUsed(new Date());
+        appsRepository.addOrRemoveFromfrequentApps(app);
         getAppsInfo().setValue(getAppsInfo().getValue());
         saveAppsUsageInfo();
     }
@@ -130,5 +105,9 @@ public class AppsViewModel extends AndroidViewModel {
     public void saveAppsUsageInfo() {
         appsRepository.saveAppsUsageInfo(getAppsInfo().getValue().getApps());
 
+    }
+
+    public ArrayList<AppDTO> getAppsByFolderId(String folderId) {
+        return appsRepository.getAppsByFolderId(getAppsInfo().getValue().getApps(), folderId);
     }
 }

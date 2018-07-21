@@ -1,12 +1,18 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +26,7 @@ import java.util.ArrayList;
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -32,20 +39,23 @@ import butterknife.Unbinder;
  * Use the {@link AppsFolder#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppsFolder extends Fragment implements View.OnClickListener {
+public class AppsFolder extends Fragment implements View.OnClickListener, LifecycleObserver {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private String folderName;
     private String folderId;
 
     private OnFragmentInteractionListener mListener;
+    private AppsFolderDialogFragmnet appsDialog;
+
+
     private RecyclerView appRV;
     private AppsAdapter appAppsAdapter;
-    private AppsViewModel mAppsModel;
     private GridLayoutManager layoutManager;
 
     @BindView(R.id.folderLayout)
@@ -56,6 +66,10 @@ public class AppsFolder extends Fragment implements View.OnClickListener {
 
 
     private Unbinder uibinder;
+
+
+    private int container;
+    private AppsViewModel mAppsModel;
 
     public AppsFolder() {
         // Required empty public constructor
@@ -70,9 +84,10 @@ public class AppsFolder extends Fragment implements View.OnClickListener {
      * @return A new instance of fragment Apps.
      */
     // TODO: Rename and change types and number of parameters
-    public static AppsFolder newInstance(String param1, String param2) {
+    public static AppsFolder newInstance(int container, String param1, String param2) {
         AppsFolder fragment = new AppsFolder();
         Bundle args = new Bundle();
+        args.putInt(ARG_PARAM3, container);
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
@@ -85,21 +100,29 @@ public class AppsFolder extends Fragment implements View.OnClickListener {
         if (getArguments() != null) {
             folderName = getArguments().getString(ARG_PARAM1);
             folderId = getArguments().getString(ARG_PARAM2);
+            container = getArguments().getInt(ARG_PARAM3);
         }
 
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER);
-        mAppsModel.getAppSuggestions().observe(this, new Observer<ArrayList<AppDTO>>() {
+        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
-            public void onChanged(@Nullable ArrayList<AppDTO> apps) {
+            public void onChanged(@Nullable AppsInfo appsInfo) {
+                appRV.setLayoutFrozen(false);
                 layoutManager.setSpanCount(2);
                 appRV.setLayoutManager(layoutManager);
-                appAppsAdapter.setApps(apps);
+                appAppsAdapter.setApps(mAppsModel.getAppsByFolderId(folderId));
+                appRV.setLayoutFrozen(true);
             }
         });
+
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -149,9 +172,15 @@ public class AppsFolder extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        AppsFolderDialogFragmnet appsDialog = AppsFolderDialogFragmnet.newInstance("", "");
-        appsDialog.show(getChildFragmentManager(), MainActivity.APPS_DIALOG);
+        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, "");
+        appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
     }
+
+    public void setName(String folderName) {
+        this.folderName = folderName;
+        folderNameTv.setText(folderName);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack.launcher.model;
 
 import android.graphics.drawable.Drawable;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import agrawal.bhanu.jetpack.reddit.model.Data;
@@ -13,11 +14,21 @@ public class AppDTO {
     private Drawable appIcon;
     private Date lastUsed;
     private int clicks;
+    private ArrayList<String> folderIds;
+
+    public ArrayList<String> getFolderIds() {
+        return folderIds;
+    }
+
+    public void setFolderIds(ArrayList<String> folderIds) {
+        this.folderIds = folderIds;
+    }
 
     public AppDTO(AppDTO app) {
         appPackage = app.getAppPackage();
         lastUsed = app.getLastUsed();
         clicks = app.getClicks();
+        folderIds = app.getFolderIds();
     }
 
     public AppDTO() {

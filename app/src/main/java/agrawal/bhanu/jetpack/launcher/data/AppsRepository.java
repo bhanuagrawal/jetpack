@@ -28,9 +28,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.ui.Apps;
 import butterknife.internal.Utils;
 
 
@@ -63,7 +65,13 @@ public class AppsRepository {
             if(appUsage != null){
                 appDTO.setClicks(appUsage.getClicks());
                 appDTO.setLastUsed(appUsage.getLastUsed());
+                appDTO.setFolderIds(appUsage.getFolderIds());
             }
+
+            if(appDTO.getFolderIds() == null){
+                appDTO.setFolderIds(new ArrayList<String>());
+            }
+            addOrRemoveFromfrequentApps(appDTO);
             apps.add(appDTO);
         }
 
@@ -243,25 +251,43 @@ public class AppsRepository {
     }
 
 
-    public ArrayList<AppDTO> fetchAppSuggestions(AppsInfo appsInfo) {
-        ArrayList<AppDTO> suggestion = new ArrayList<>();
-        for(AppDTO appDTO: appsInfo.getApps()){
+    public void addOrRemoveFromfrequentApps(AppDTO appDTO) {
 
-            if(appDTO.getLastUsed() != null){
-                long diffHours = (new Date().getTime() - appDTO.getLastUsed().getTime())/ (60 * 60 * 1000);
-                if(diffHours <= 24){
-                    suggestion.add(appDTO);
+        if(appDTO.getLastUsed() != null){
+            long diffHours = (new Date().getTime() - appDTO.getLastUsed().getTime())/ (60 * 60 * 1000);
+            if(diffHours <= 24){
+                if(appDTO.getFolderIds().indexOf(MainActivity.FREQUENT_APPS) < 0){
+                    appDTO.getFolderIds().add(MainActivity.FREQUENT_APPS);
                 }
+            }
+            else{
+                if(appDTO.getFolderIds().indexOf(MainActivity.FREQUENT_APPS) >= 0){
+                    appDTO.getFolderIds().remove(MainActivity.FREQUENT_APPS);
+                }
+            }
+        }
+
+    }
+
+    public ArrayList<AppDTO> getAppsByFolderId(ArrayList<AppDTO> apps, String folderId) {
+
+        ArrayList<AppDTO> suggestion = new ArrayList<>();
+        for(AppDTO appDTO: apps){
+
+            if(appDTO.getFolderIds().indexOf(folderId) >= 0){
+                suggestion.add(appDTO);
             }
 
         }
 
-        Collections.sort(suggestion, new Comparator<AppDTO>() {
-            @Override
-            public int compare(AppDTO appDTO, AppDTO t1) {
-                return t1.getClicks()-appDTO.getClicks();
-            }
-        });
+        if(folderId.equals(MainActivity.FREQUENT_APPS)){
+            Collections.sort(suggestion, new Comparator<AppDTO>() {
+                @Override
+                public int compare(AppDTO appDTO, AppDTO t1) {
+                    return t1.getClicks()-appDTO.getClicks();
+                }
+            });
+        }
 
         return suggestion;
     }

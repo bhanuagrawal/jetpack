@@ -1,6 +1,5 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
-import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -12,26 +11,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
-import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.FolderView;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import butterknife.BindView;
@@ -64,12 +58,13 @@ public class DefaultPage extends Fragment {
     ConstraintLayout layout;
 
     @BindView(R.id.folderContainer)
-    FrameLayout frequentAppContainer;
+    FrameLayout folderView;
 
 
     private AppsAdapter appsAdapter;
     private LinearLayoutManager layoutManager;
-    private Fragment frequentApps;
+    private Folder folder;
+    private AppsFolder appsFolder;
 
     public DefaultPage() {
         // Required empty public constructor
@@ -105,12 +100,6 @@ public class DefaultPage extends Fragment {
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
         appsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.HOME);
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        if (savedInstanceState != null) {
-            frequentApps = getChildFragmentManager().getFragment(savedInstanceState, MainActivity.FREQUENT_APPS);
-        }
-        else{
-            frequentApps = AppsFolder.newInstance("Frequent Apps", MainActivity.FREQUENT_APPS);
-        }
 
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
@@ -127,25 +116,13 @@ public class DefaultPage extends Fragment {
                 }
             }
         });
-
-
-        getChildFragmentManager().
-                beginTransaction().
-                replace(R.id.folderContainer, frequentApps, MainActivity.FREQUENT_APPS).
-                commit();
-
-        mAppsModel.getAppSuggestions().observe(this, new Observer<ArrayList<AppDTO>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<AppDTO> apps) {
-                frequentAppContainer.setVisibility(apps.isEmpty()?View.GONE:View.VISIBLE);
-            }
-        });
+        appsFolder = Folder.newFolder(savedInstanceState, getContext(), R.id.folderContainer, "Frequent Apps", MainActivity.FREQUENT_APPS);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        getChildFragmentManager().putFragment(outState, MainActivity.FREQUENT_APPS, frequentApps);
+        ((FragmentActivity)getContext()).getSupportFragmentManager().putFragment(outState, MainActivity.FREQUENT_APPS, appsFolder);
     }
 
     @Override

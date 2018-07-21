@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -108,6 +109,15 @@ implements ItemsList.OnFragmentInteractionListener,
 
     @Override
     public void onBackPressed() {
+
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(MainActivity.APPS_DIALOG);
+        if (prev != null  &&
+                prev.isVisible()) {
+            DialogFragment df = (DialogFragment) prev;
+            df.dismiss();
+            return;
+        }
+
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(HOME_FRAGMENT);
         if(fragment != null &&
                 fragment.isVisible()){

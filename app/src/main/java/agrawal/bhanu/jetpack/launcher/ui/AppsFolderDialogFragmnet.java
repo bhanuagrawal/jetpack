@@ -1,5 +1,7 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
+import android.app.Dialog;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,8 +23,7 @@ import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,14 +40,14 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String folderId;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
     private RecyclerView appRV;
     private AppsAdapter appAppsAdapter;
-    private AppsViewModel mAppsModel;
     private GridLayoutManager layoutManager;
+    private AppsViewModel mAppsModel;
 
 
     public AppsFolderDialogFragmnet() {
@@ -67,6 +69,7 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+        fragment.setRetainInstance(true);
         return fragment;
     }
 
@@ -74,22 +77,30 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            folderId = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER_DIALOG);
         mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
-        layoutManager = new GridLayoutManager(getActivity(), 1);
-        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.ALL_APPS);
-        mAppsModel.getAppSuggestions().observe(this, new Observer<ArrayList<AppDTO>>() {
+
+        mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
-            public void onChanged(@Nullable ArrayList<AppDTO> apps) {
-                layoutManager.setSpanCount(3);
-                appRV.setLayoutManager(layoutManager);
-                appAppsAdapter.setApps(apps);
+            public void onChanged(@Nullable AppsInfo appsInfo) {
+                appAppsAdapter.setApps(mAppsModel.getAppsByFolderId(folderId));
             }
         });
     }
 
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+        // handles https://code.google.com/p/android/issues/detail?id=17423
+        if (dialog != null && getRetainInstance()) {
+            dialog.setDismissMessage(null);
+        }
+        super.onDestroyView();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,8 +109,10 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_fragment_apps, container, false);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         appRV = (RecyclerView)view.findViewById(R.id.applist);
-        appRV.setLayoutManager(layoutManager);
         appRV.setAdapter(appAppsAdapter);
+        layoutManager = new GridLayoutManager(getActivity(), 1);
+        layoutManager.setSpanCount(3);
+        appRV.setLayoutManager(layoutManager);
         return view;
     }
 
@@ -126,6 +139,8 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
         super.onDetach();
         mListener = null;
     }
+
+
 
 
 
