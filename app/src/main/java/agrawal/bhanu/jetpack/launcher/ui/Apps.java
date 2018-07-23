@@ -42,7 +42,7 @@ public class Apps extends Fragment {
     private OnFragmentInteractionListener mListener;
     private RecyclerView appRV;
     private AppsAdapter appAppsAdapter;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
     private int position;
     private GridLayoutManager layoutManager;
 
@@ -75,7 +75,7 @@ public class Apps extends Fragment {
             position = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.ALL_APPS);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
@@ -92,7 +92,7 @@ public class Apps extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the rootLayout for this fragment
         View view = inflater.inflate(R.layout.fragment_apps, container, false);
         appRV = (RecyclerView)view.findViewById(R.id.applist);
         appRV.setLayoutManager(layoutManager);

@@ -7,11 +7,13 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,8 +28,8 @@ import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
-import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
-import agrawal.bhanu.jetpack.launcher.ui.folder.Folder;
+import agrawal.bhanu.jetpack.launcher.model.Folder;
+import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 /**
@@ -49,22 +51,23 @@ public class DefaultPage extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
 
     @BindView(R.id.default_apps)
     RecyclerView defaultApps;
 
     @BindView(R.id.layout)
-    ConstraintLayout layout;
+    ConstraintLayout rootLayout;
 
-    @BindView(R.id.folderContainer)
-    FrameLayout folderView;
-
+    @BindView(R.id.apps_folder_recyclerview)
+    RecyclerView appsFolderRecyclerview;
 
     private AppsAdapter appsAdapter;
     private LinearLayoutManager layoutManager;
-    private Folder folder;
-    private AppsFolder appsFolder;
+
+    private FolderManager folderManager;
+    private GridLayoutManager appsFolderLayoutManager;
+    private AppsFolderAdapter appsFolderAdapter;
 
     public DefaultPage() {
         // Required empty public constructor
@@ -97,14 +100,15 @@ public class DefaultPage extends Fragment {
         }
 
         ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         appsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.HOME);
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
+        appsFolderLayoutManager  =new GridLayoutManager(getActivity(), 1);
+        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<Object>());
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
-            public void onChanged(@Nullable final AppsInfo appsInfo) {
-                folderView.setVisibility(mAppsModel.getAppsByFolderId(MainActivity.FREQUENT_APPS).isEmpty()?View.GONE:View.VISIBLE);
+            public void onChanged(@Nullable final AppsInfo appsInfo) {;
                 appsAdapter.setApps(appsInfo.getDefaultApps());
             }
         };
@@ -113,27 +117,40 @@ public class DefaultPage extends Fragment {
             @Override
             public void onChanged(@Nullable Drawable drawable) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    layout.setBackground(drawable);
+                    rootLayout.setBackground(drawable);
                 }
             }
         });
-        appsFolder = Folder.newFolder(savedInstanceState, getContext(), R.id.folderContainer, "Frequent Apps", MainActivity.FREQUENT_APPS);
+
+        folderManager = new FolderManager(getContext());
+        mAppsModel.getFolders().observe(this, new Observer<ArrayList<Object>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<Object> appsFolder) {
+                appsFolderLayoutManager.setSpanCount(4);
+                appsFolderAdapter.setAppsFolder(appsFolder);
+            }
+        });
+
+
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        ((FragmentActivity)getContext()).getSupportFragmentManager().putFragment(outState, MainActivity.FREQUENT_APPS, appsFolder);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.default_page, container, false);
+        // Inflate the rootLayout for this fragment
+        final View view = inflater.inflate(R.layout.default_page, container, false);
         ButterKnife.bind(this, view);
         defaultApps.setLayoutManager(layoutManager);
         defaultApps.setAdapter(appsAdapter);
+
+
+        appsFolderRecyclerview.setLayoutManager(appsFolderLayoutManager);
+        appsFolderRecyclerview.setAdapter(appsFolderAdapter);
         return view;
     }
 

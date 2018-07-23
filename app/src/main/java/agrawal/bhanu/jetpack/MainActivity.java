@@ -20,9 +20,9 @@ import android.view.WindowManager;
 
 import agrawal.bhanu.jetpack.launcher.ui.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
 import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolderDialogFragmnet;
-import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
@@ -41,9 +41,10 @@ implements ItemsList.OnFragmentInteractionListener,
     private static final String HOME_FRAGMENT = "homefragment";
     public static final String FREQUENT_APPS = "frequentFragment";
     public static final String APPS_DIALOG = "appsdialog";
+    public static final String NEW_FOLDER = "asdfasdfasdf" ;
     private BroadcastReceiver receiver;
     private Fragment homeFragment;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ implements ItemsList.OnFragmentInteractionListener,
             homeFragment = Home.newInstance("", "");
         }
 
-        mAppsModel = ViewModelProviders.of(this).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(this).get(LauncherViewModel.class);
         int MyVersion = Build.VERSION.SDK_INT;
         if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (!AppUtils.checkIfAlreadyhavePermission(getApplication())) {
@@ -84,10 +85,10 @@ implements ItemsList.OnFragmentInteractionListener,
             public void onReceive(Context context, Intent intent) {
                 Log.d("wallpapeer", "changes");
                 if(intent.getAction() == Intent.ACTION_WALLPAPER_CHANGED){
-                    ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onWallpaperChange();
+                    ViewModelProviders.of(MainActivity.this).get(LauncherViewModel.class).onWallpaperChange();
                 }
                 else{
-                    ViewModelProviders.of(MainActivity.this).get(AppsViewModel.class).onAppListChange();
+                    ViewModelProviders.of(MainActivity.this).get(LauncherViewModel.class).onAppListChange();
                 }
 
             }

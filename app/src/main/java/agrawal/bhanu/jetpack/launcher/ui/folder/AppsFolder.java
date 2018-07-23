@@ -25,7 +25,7 @@ import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
-import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -68,7 +68,7 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
 
 
     private int container;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
 
     public AppsFolder() {
         // Required empty public constructor
@@ -104,7 +104,7 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
 
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER);
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable AppsInfo appsInfo) {
@@ -172,7 +172,7 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
 
     @Override
     public void onClick(View view) {
-        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, "");
+        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folderName);
         appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
     }
 

@@ -30,8 +30,10 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.ui.Apps;
 import butterknife.internal.Utils;
 
@@ -290,5 +292,25 @@ public class AppsRepository {
         }
 
         return suggestion;
+    }
+
+    public void fetchFolders(MutableLiveData<ArrayList<Object>> folders) {
+
+        Folder frequestApps = new Folder();
+        frequestApps.setFolderId(MainActivity.FREQUENT_APPS);
+        frequestApps.setFolderName("Frequent Apps");
+
+        Folder newFoler = new Folder();
+        newFoler.setFolderId(MainActivity.NEW_FOLDER);
+        newFoler.setFolderName("New Folder");
+
+        ArrayList<Object> foldersList = new ArrayList<>();
+
+        for(int i=0; i<4*(getAppRowCount())-1; i++){
+            foldersList.add(new Folder());
+        }
+
+        foldersList.add(frequestApps);
+        folders.postValue(foldersList);
     }
 }

@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,10 @@ import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
-import agrawal.bhanu.jetpack.launcher.ui.AppsViewModel;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,13 +45,19 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
 
     // TODO: Rename and change types of parameters
     private String folderId;
-    private String mParam2;
+    private String folderName;
 
     private OnFragmentInteractionListener mListener;
-    private RecyclerView appRV;
+    @BindView(R.id.applist)
+    RecyclerView appRV;
+
+    @BindView(R.id.folder_title)
+    TextView folderTitleTv;
+
     private AppsAdapter appAppsAdapter;
     private GridLayoutManager layoutManager;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
+    private Unbinder uibinder;
 
 
     public AppsFolderDialogFragmnet() {
@@ -78,10 +88,10 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             folderId = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            folderName = getArguments().getString(ARG_PARAM2);
         }
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER_DIALOG);
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
 
         mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
@@ -100,6 +110,7 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
             dialog.setDismissMessage(null);
         }
         super.onDestroyView();
+        uibinder.unbind();
     }
 
     @Override
@@ -107,8 +118,9 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.dialog_fragment_apps, container, false);
+        uibinder = ButterKnife.bind(this, view);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        appRV = (RecyclerView)view.findViewById(R.id.applist);
+        folderTitleTv.setText(folderName);
         appRV.setAdapter(appAppsAdapter);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         layoutManager.setSpanCount(3);

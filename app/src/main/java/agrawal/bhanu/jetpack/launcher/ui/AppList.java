@@ -15,11 +15,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
-
-import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -27,7 +22,6 @@ import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.util.FixedSpeedScroller;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,7 +44,7 @@ public class AppList extends Fragment{
     private OnFragmentInteractionListener mListener;
     private MyAdapter mAdapter;
     private ViewPager appsViewPager;
-    private AppsViewModel mAppsModel;
+    private LauncherViewModel mAppsModel;
     private TabLayout tabLayout;
 
 
@@ -90,7 +84,7 @@ public class AppList extends Fragment{
 
         ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAdapter = new MyAdapter(getChildFragmentManager());
-        mAppsModel = ViewModelProviders.of(getActivity()).get(AppsViewModel.class);
+        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {

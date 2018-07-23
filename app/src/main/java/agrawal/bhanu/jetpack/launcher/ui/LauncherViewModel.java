@@ -20,10 +20,12 @@ import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.launcher.model.Folder;
 
-public class AppsViewModel extends AndroidViewModel {
+public class LauncherViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
+    private MutableLiveData<ArrayList<Object>> folders;
     private MutableLiveData<Drawable> wallpaper;
     private Application application;
     @Inject
@@ -37,10 +39,23 @@ public class AppsViewModel extends AndroidViewModel {
     WallpaperManager wallpaperManager;
 
 
-    public AppsViewModel(@NonNull Application application) {
+    public LauncherViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
         ((MyApp)application).getLocalDataComponent().inject(this);
+    }
+
+    public MutableLiveData<ArrayList<Object>> getFolders() {
+        if(folders == null){
+            folders = new MutableLiveData<ArrayList<Object>>();
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    appsRepository.fetchFolders(folders);
+                }
+            });
+        }
+        return folders;
     }
 
     public MutableLiveData<AppsInfo> getAppsInfo() {
