@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
@@ -141,9 +144,8 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
 
     @Override
     public void onBindViewHolder(AppViewHolder holder, final int position) {
-
         holder.appNameTV.setText(apps.get(position).getAppName());
-        holder.appIconIV.setImageDrawable(apps.get(position).getAppIcon());
+        holder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(apps.get(position).getAppPackage()));
     }
 
 

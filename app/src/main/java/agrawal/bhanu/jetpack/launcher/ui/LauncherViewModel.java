@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.Folder;
@@ -25,7 +26,7 @@ import agrawal.bhanu.jetpack.launcher.model.Folder;
 public class LauncherViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
-    private MutableLiveData<ArrayList<Object>> folders;
+    private MutableLiveData<ArrayList<AppsAndFolder>> folders;
     private MutableLiveData<Drawable> wallpaper;
     private Application application;
     @Inject
@@ -45,9 +46,9 @@ public class LauncherViewModel extends AndroidViewModel {
         ((MyApp)application).getLocalDataComponent().inject(this);
     }
 
-    public MutableLiveData<ArrayList<Object>> getFolders() {
+    public MutableLiveData<ArrayList<AppsAndFolder>> getFolders() {
         if(folders == null){
-            folders = new MutableLiveData<ArrayList<Object>>();
+            folders = new MutableLiveData<ArrayList<AppsAndFolder>>();
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -56,6 +57,12 @@ public class LauncherViewModel extends AndroidViewModel {
             });
         }
         return folders;
+    }
+
+    public void updateDefaultPage(AppsAndFolder appsAndFolder, int position){
+        getFolders().getValue().set(position, appsAndFolder);
+        getFolders().setValue(getFolders().getValue());
+        appsRepository.saveFoldersInfo(getFolders().getValue());
     }
 
     public MutableLiveData<AppsInfo> getAppsInfo() {
@@ -124,5 +131,13 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public ArrayList<AppDTO> getAppsByFolderId(String folderId) {
         return appsRepository.getAppsByFolderId(getAppsInfo().getValue().getApps(), folderId);
+    }
+
+    public void onFoldersChange() {
+        appsRepository.saveFoldersInfo(getFolders().getValue());
+    }
+
+    public Drawable getAppIcon(String appPackage) {
+        return appsRepository.getAppIcon(appPackage);
     }
 }

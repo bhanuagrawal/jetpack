@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
@@ -17,25 +18,26 @@ import android.view.WindowManager;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
-import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.model.Folder;
-import agrawal.bhanu.jetpack.launcher.ui.Apps;
-import butterknife.internal.Utils;
+import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
 
 
 public class AppsRepository {
@@ -62,7 +64,7 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(app.loadLabel(packageManager).toString());
             appDTO.setAppPackage(app.activityInfo.packageName);
-            appDTO.setAppIcon(app.loadIcon(packageManager));
+            //appDTO.setAppIcon(app.loadIcon(packageManager));
             AppDTO appUsage = getAppFromPackage(appsUsageInfo, app.activityInfo.packageName);
             if(appUsage != null){
                 appDTO.setClicks(appUsage.getClicks());
@@ -136,13 +138,21 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(callApps.get(0).loadLabel(packageManager).toString());
             appDTO.setAppPackage(callApps.get(0).activityInfo.packageName);
-            appDTO.setAppIcon(callApps.get(0).loadIcon(packageManager));
             return appDTO;
         }
 
         return null;
     }
 
+
+    public Drawable getAppIcon(String packageName){
+        try {
+            return packageManager.getApplicationIcon(packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private AppDTO getDefaultInternetApp(Intent intent) {
         List<ResolveInfo> browserList;
@@ -156,7 +166,6 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(browserList.get(0).loadLabel(packageManager).toString());
             appDTO.setAppPackage(browserList.get(0).activityInfo.packageName);
-            appDTO.setAppIcon(browserList.get(0).loadIcon(packageManager));
             return appDTO;
         }
 
@@ -195,7 +204,6 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(resolveInfo.loadLabel(packageManager).toString());
             appDTO.setAppPackage(resolveInfo.activityInfo.packageName);
-            appDTO.setAppIcon(resolveInfo.loadIcon(packageManager));
             return appDTO;
         }
         return null;
@@ -294,23 +302,54 @@ public class AppsRepository {
         return suggestion;
     }
 
-    public void fetchFolders(MutableLiveData<ArrayList<Object>> folders) {
+    public void fetchFolders(MutableLiveData<ArrayList<AppsAndFolder>> folders) {
 
-        Folder frequestApps = new Folder();
-        frequestApps.setFolderId(MainActivity.FREQUENT_APPS);
-        frequestApps.setFolderName("Frequent Apps");
+        ArrayList<AppsAndFolder> prevAppsAndFolders = getFolderFromMemory();
 
-        Folder newFoler = new Folder();
-        newFoler.setFolderId(MainActivity.NEW_FOLDER);
-        newFoler.setFolderName("New Folder");
+        if(prevAppsAndFolders.isEmpty()){
+            Folder frequestApps = new Folder();
+            frequestApps.setFolderId(MainActivity.FREQUENT_APPS);
+            frequestApps.setFolderName("Frequent Apps");
 
-        ArrayList<Object> foldersList = new ArrayList<>();
 
-        for(int i=0; i<4*(getAppRowCount())-1; i++){
-            foldersList.add(new Folder());
+            ArrayList<AppsAndFolder> foldersList = new ArrayList<>();
+
+            for(int i=0; i<4*(getAppRowCount())-1; i++){
+                Folder f = new Folder();
+                foldersList.add(f);
+            }
+
+            foldersList.add(frequestApps);
+            saveFoldersInfo(foldersList);
+            folders.postValue(foldersList);
+        }
+        else {
+            folders.postValue(prevAppsAndFolders);
         }
 
-        foldersList.add(frequestApps);
-        folders.postValue(foldersList);
+
+
+    }
+
+    private ArrayList<AppsAndFolder> getFolderFromMemory() {
+       // return new ArrayList<>();
+
+        RuntimeTypeAdapterFactory<AppsAndFolder> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(AppsAndFolder.class, "type")
+                .registerSubtype(AppDTO.class, AppsAndFolder.APP)
+                .registerSubtype(Folder.class, AppsAndFolder.FOLDER);
+
+        Gson gsonRuntimeTypeAdapterFactory = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
+        return gsonRuntimeTypeAdapterFactory.fromJson(sharedPreferences.getString("folders", "[]"), new TypeToken<ArrayList<AppsAndFolder>>(){}.getType());
+    }
+
+    public void saveFoldersInfo(ArrayList<AppsAndFolder> appsFolders) {
+
+        RuntimeTypeAdapterFactory<AppsAndFolder> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(AppsAndFolder.class, "type")
+                .registerSubtype(AppDTO.class, AppsAndFolder.APP)
+                .registerSubtype(Folder.class, AppsAndFolder.FOLDER);
+        Gson gsonRuntimeTypeAdapterFactory = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
+        sharedPreferences.edit().putString("folders", gsonRuntimeTypeAdapterFactory.toJson(appsFolders)).commit();
     }
 }

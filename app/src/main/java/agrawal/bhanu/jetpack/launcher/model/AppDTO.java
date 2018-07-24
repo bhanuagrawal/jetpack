@@ -2,16 +2,16 @@ package agrawal.bhanu.jetpack.launcher.model;
 
 import android.graphics.drawable.Drawable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 import agrawal.bhanu.jetpack.reddit.model.Data;
 
-public class AppDTO {
+public class AppDTO extends AppsAndFolder implements Serializable {
     
     private String appName;
     private String appPackage;
-    private Drawable appIcon;
     private Date lastUsed;
     private int clicks;
     private ArrayList<String> folderIds;
@@ -29,9 +29,11 @@ public class AppDTO {
         lastUsed = app.getLastUsed();
         clicks = app.getClicks();
         folderIds = app.getFolderIds();
+        type = AppsAndFolder.APP;
     }
 
     public AppDTO() {
+        type = AppsAndFolder.APP;
     }
 
     public Date getLastUsed() {
@@ -48,14 +50,6 @@ public class AppDTO {
 
     public void setClicks(int clicks) {
         this.clicks = clicks;
-    }
-
-    public Drawable getAppIcon() {
-        return appIcon;
-    }
-
-    public void setAppIcon(Drawable appIcon) {
-        this.appIcon = appIcon;
     }
 
     public String getAppName() {

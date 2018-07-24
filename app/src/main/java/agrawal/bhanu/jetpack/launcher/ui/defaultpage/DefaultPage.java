@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.defaultpage;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -11,24 +11,28 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.Executor;
 
-import agrawal.bhanu.jetpack.MainActivity;
+import javax.inject.Inject;
+
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
-import agrawal.bhanu.jetpack.launcher.model.Folder;
+import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,12 +66,16 @@ public class DefaultPage extends Fragment {
     @BindView(R.id.apps_folder_recyclerview)
     RecyclerView appsFolderRecyclerview;
 
+    @Inject
+    Executor executor;
+
     private AppsAdapter appsAdapter;
     private LinearLayoutManager layoutManager;
 
     private FolderManager folderManager;
     private GridLayoutManager appsFolderLayoutManager;
     private AppsFolderAdapter appsFolderAdapter;
+    private ItemTouchHelper ith;
 
     public DefaultPage() {
         // Required empty public constructor
@@ -105,11 +113,12 @@ public class DefaultPage extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         appsFolderLayoutManager  =new GridLayoutManager(getActivity(), 1);
-        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<Object>());
+        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<AppsAndFolder>());
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {;
                 appsAdapter.setApps(appsInfo.getDefaultApps());
+                appsFolderAdapter.notifyDataSetChanged();
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
@@ -123,14 +132,47 @@ public class DefaultPage extends Fragment {
         });
 
         folderManager = new FolderManager(getContext());
-        mAppsModel.getFolders().observe(this, new Observer<ArrayList<Object>>() {
+        mAppsModel.getFolders().observe(this, new Observer<ArrayList<AppsAndFolder>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<Object> appsFolder) {
+            public void onChanged(@Nullable ArrayList<AppsAndFolder> appsFolder) {
                 appsFolderLayoutManager.setSpanCount(4);
                 appsFolderAdapter.setAppsFolder(appsFolder);
             }
         });
 
+        ItemTouchHelper.Callback _ithCallback = new ItemTouchHelper.Callback() {
+            //and in your imlpementaion of
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // get the viewHolder's and target's positions in your adapter data, swap them
+                Collections.swap(mAppsModel.getFolders().getValue(), viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                // and notify the adapter that its dataset has changed
+                appsFolderAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                mAppsModel.onFoldersChange();
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                //TODO
+            }
+
+            //defines the enabled move directions in each state (idle, swiping, dragging).
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                        ItemTouchHelper.DOWN | ItemTouchHelper.UP | ItemTouchHelper.START | ItemTouchHelper.END);
+            }
+        };
+
+        ith = new ItemTouchHelper(_ithCallback);
+//
+//        final Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mAppsModel.updateDefaultPage(mAppsModel.getAppsInfo().getValue().getGoogleApp(), 5);
+//            }
+//        }, 2000);
 
     }
 
@@ -148,9 +190,10 @@ public class DefaultPage extends Fragment {
         defaultApps.setLayoutManager(layoutManager);
         defaultApps.setAdapter(appsAdapter);
 
-
         appsFolderRecyclerview.setLayoutManager(appsFolderLayoutManager);
         appsFolderRecyclerview.setAdapter(appsFolderAdapter);
+        ith.attachToRecyclerView(appsFolderRecyclerview);
+
         return view;
     }
 

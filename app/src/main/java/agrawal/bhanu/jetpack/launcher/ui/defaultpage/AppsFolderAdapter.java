@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.defaultpage;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.Folder;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,19 +35,19 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private final Context context;
     private final LauncherViewModel mAppsModel;
     private final FolderManager folderMananger;
-    private ArrayList<Object> appsFolder;
+    private ArrayList<AppsAndFolder> appsFolder;
     public static final int HOME = 0;
     public static final int ALL_APPS = 1;
     public static final int FOLDER = 2;
     public static final int FOLDER_DIALOG = 3;
 
 
-    public void setAppsFolder(ArrayList<Object> apps) {
+    public void setAppsFolder(ArrayList<AppsAndFolder> apps) {
         this.appsFolder = apps;
         notifyDataSetChanged();
     }
 
-    public AppsFolderAdapter(Context context, ArrayList<Object> appsFolder) {
+    public AppsFolderAdapter(Context context, ArrayList<AppsAndFolder> appsFolder) {
         this.context = context;
         this.appsFolder = appsFolder;
         mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
@@ -114,14 +116,13 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public FolderViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-/*            Folder folder = (Folder) appsFolder.get(getAdapterPosition());
-            frameLayout.setVisibility(mAppsModel.getAppsByFolderId(folder.getFolderId()).isEmpty()?View.INVISIBLE:View.VISIBLE);*/
         }
 
         public void bindTo(Folder folder) {
+            frameLayout.setVisibility(mAppsModel.getAppsByFolderId(folder.getFolderId()).isEmpty()?View.INVISIBLE:View.VISIBLE);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
 
-                if(folder.getFolderId() != null){
+                if(folder.getFolderId() != null && !folder.getFolderId().isEmpty()){
                     int newContainerId = View.generateViewId();
                     frameLayout.setId(newContainerId);
                     folderMananger.newFolder(frameLayout.getId(), folder.getFolderName(), folder.getFolderId());
@@ -135,7 +136,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public int getItemViewType(int position) {
 
-        if(appsFolder.get(position) instanceof AppDTO){
+        if(appsFolder.get(position).getType().equals(AppsAndFolder.APP)){
             return ALL_APPS;
         }
         else{
@@ -178,7 +179,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             AppViewHolder viewHolder = (AppViewHolder)holder;
             AppDTO app = (AppDTO)appsFolder.get(position);
             viewHolder.appNameTV.setText(app.getAppName());
-            viewHolder.appIconIV.setImageDrawable(app.getAppIcon());
+            viewHolder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(app.getAppPackage()));
         }
         else{
             FolderViewHolder viewHolder = (FolderViewHolder)holder;

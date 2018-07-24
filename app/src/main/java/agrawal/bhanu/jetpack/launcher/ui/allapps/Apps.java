@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.allapps;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -20,6 +20,8 @@ import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

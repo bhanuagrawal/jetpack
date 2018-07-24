@@ -1,16 +1,15 @@
 package agrawal.bhanu.jetpack.launcher.model;
 
-public class Folder {
+import java.io.Serializable;
+
+public class Folder extends AppsAndFolder implements Serializable{
     private String folderName;
     private String FolderId;
-    private int folderContainer;
 
-    public int getFolderContainer() {
-        return folderContainer;
-    }
-
-    public void setFolderContainer(int folderContainer) {
-        this.folderContainer = folderContainer;
+    public Folder() {
+        folderName = "";
+        FolderId = "";
+        type = AppsAndFolder.FOLDER;
     }
 
     public String getFolderName() {
@@ -28,4 +27,5 @@ public class Folder {
     public void setFolderId(String folderId) {
         FolderId = folderId;
     }
+
 }

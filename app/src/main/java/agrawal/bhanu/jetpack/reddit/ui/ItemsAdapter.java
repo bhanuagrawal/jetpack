@@ -159,7 +159,7 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
             titleTV.setText(post.getData().getTitle());
             freeTextTv.setText(post.getData().getSelftext());
             subredditTV.setText(post.getData().getSubreddit());
-            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvodes");
+            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvotes");
             Picasso.get()
                     .load(post.getData().getThumbnail()) // thumbnail url goes here
                     .into(imageView, new Callback() {

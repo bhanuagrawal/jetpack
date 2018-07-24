@@ -43,4 +43,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation files('lib/gson-extras-0.1.0.jar')
 }

@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,8 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import agrawal.bhanu.jetpack.Constants;
-import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.ui.allapps.AppList;
+import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 import butterknife.BindView;
 import butterknife.ButterKnife;

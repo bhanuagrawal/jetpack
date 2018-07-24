@@ -18,12 +18,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 
-import agrawal.bhanu.jetpack.launcher.ui.AppList;
-import agrawal.bhanu.jetpack.launcher.ui.Apps;
+import agrawal.bhanu.jetpack.launcher.ui.allapps.AppList;
+import agrawal.bhanu.jetpack.launcher.ui.allapps.Apps;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder;
 import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolderDialogFragmnet;
-import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
+import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 

@@ -1,4 +1,4 @@
-package agrawal.bhanu.jetpack.launcher.ui;
+package agrawal.bhanu.jetpack.launcher.ui.allapps;
 
 import android.app.WallpaperManager;
 import android.arch.lifecycle.Observer;
@@ -22,6 +22,7 @@ import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 
 /**
  * A simple {@link Fragment} subclass.

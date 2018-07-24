@@ -4,9 +4,9 @@ package agrawal.bhanu.jetpack.components;
 import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
-import agrawal.bhanu.jetpack.launcher.ui.AppList;
+import agrawal.bhanu.jetpack.launcher.ui.allapps.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
-import agrawal.bhanu.jetpack.launcher.ui.DefaultPage;
+import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.modules.AppModule;
 import agrawal.bhanu.jetpack.modules.LocalDataModule;
 import dagger.Component;
