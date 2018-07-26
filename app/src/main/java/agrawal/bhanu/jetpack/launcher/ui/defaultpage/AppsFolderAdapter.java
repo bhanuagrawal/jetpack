@@ -11,35 +11,39 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.model.AppContainer;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
+import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final int APP_CONTAINER = 5;
     private final Context context;
     private final LauncherViewModel mAppsModel;
     private final FolderManager folderMananger;
     private ArrayList<AppsAndFolder> appsFolder;
-    public static final int HOME = 0;
-    public static final int ALL_APPS = 1;
     public static final int FOLDER = 2;
-    public static final int FOLDER_DIALOG = 3;
 
 
     public void setAppsFolder(ArrayList<AppsAndFolder> apps) {
@@ -54,67 +58,16 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         folderMananger = new FolderManager(context);
     }
 
-    public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView appNameTV;
-        public ImageView appIconIV;
-        public ConstraintLayout parentLayout;
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        private PackageManager pm;
-
-        public AppViewHolder(View view, int viewType) {
-            super(view);
-            appNameTV = (TextView) view.findViewById(R.id.app_name);
-            appNameTV.setVisibility(viewType == ALL_APPS || viewType == FOLDER_DIALOG? View.VISIBLE: View.GONE);
-            appIconIV = (ImageView) view.findViewById(R.id.app_icon);
-            parentLayout = (ConstraintLayout) view.findViewById(R.id.parentlayout);
-            if(viewType != FOLDER){
-                parentLayout.setOnClickListener(this);
-                parentLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        int position = getAdapterPosition();
-                        intent.setData(Uri.parse("package:" + ((AppDTO)appsFolder.get(position)).getAppPackage()));
-                        context.startActivity(intent);
-                        return true;
-                    }
-                });
-            }
-
-        }
-
-        @Override
-        public void onClick(View view) {
-            int position = getAdapterPosition();
-            pm = context.getPackageManager();
-            try{
-                if(getItemViewType() == FOLDER_DIALOG){
-                    ((Activity)context).onBackPressed();
-                }
-                Intent intent = pm.getLaunchIntentForPackage(((AppDTO)appsFolder.get(position)).getAppPackage());
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                if(intent == null){
-                    throw new PackageManager.NameNotFoundException();
-                }else{
-                    mAppsModel.onAppSelected(((AppDTO)appsFolder.get(position)));
-                    context.startActivity(intent);
-                }
-            }catch(PackageManager.NameNotFoundException e){
-            }
-            catch(Exception e){
-            }
-
-        }
-    }
 
 
-    public class FolderViewHolder extends RecyclerView.ViewHolder{
+    public class FolderViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
 
         @BindView(R.id.folderContainer)
         FrameLayout frameLayout;
 
         public FolderViewHolder(View view) {
             super(view);
+            view.setOnCreateContextMenuListener(this);
             ButterKnife.bind(this, view);
         }
 
@@ -130,14 +83,29 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
 
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+
+            if(((Folder)appsFolder.get(getAdapterPosition())).getRemovable()){
+                MenuItem add_to_home = contextMenu.add("Remove");
+                add_to_home.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        mAppsModel.removeFromHome(getAdapterPosition());
+                        return false;
+                    }
+                });
+            }
+        }
     }
 
 
     @Override
     public int getItemViewType(int position) {
 
-        if(appsFolder.get(position).getType().equals(AppsAndFolder.APP)){
-            return ALL_APPS;
+        if(appsFolder.get(position) instanceof AppContainer){
+            return APP_CONTAINER;
         }
         else{
             return FOLDER;
@@ -151,10 +119,10 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         switch (viewType){
 
-            case ALL_APPS:
+            case APP_CONTAINER:
                 itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                        .inflate(R.layout.row_app_container, parent, false);
+                return new AppViewHolder(itemView, viewType, context);
             case FOLDER:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_folder, parent, false);
@@ -162,7 +130,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             default:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                return new AppViewHolder(itemView, viewType, context);
 
         }
 
@@ -174,12 +142,16 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        if(holder.getItemViewType() ==  ALL_APPS){
+        if(holder.getItemViewType() ==  APP_CONTAINER){
 
             AppViewHolder viewHolder = (AppViewHolder)holder;
-            AppDTO app = (AppDTO)appsFolder.get(position);
-            viewHolder.appNameTV.setText(app.getAppName());
-            viewHolder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(app.getAppPackage()));
+            AppDTO app = mAppsModel.getAppByContainer(((AppContainer)appsFolder.get(position)));
+            viewHolder.parentLayout.setVisibility(app == null?View.GONE:View.VISIBLE);
+            if(app != null){
+                viewHolder.appNameTV.setText(app.getAppName());
+                viewHolder.appIconIV.setImageDrawable(app.getIcon());
+                viewHolder.setApp(app);
+            }
         }
         else{
             FolderViewHolder viewHolder = (FolderViewHolder)holder;

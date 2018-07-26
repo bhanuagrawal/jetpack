@@ -5,9 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,7 +20,6 @@ import android.widget.TextView;
 
 import javax.inject.Inject;
 
-import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
@@ -71,7 +68,7 @@ public class ItemsList extends Fragment {
     RelativeLayout errorLayout;
 
     @BindView(R.id.swiperefresh)
-    SwipeRefreshLayout swifeToRefresh;
+    SwipeRefreshLayout swipeToRefresh;
 
     @BindView(R.id.retry)
     TextView retry;
@@ -132,7 +129,7 @@ public class ItemsList extends Fragment {
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
                 if(networkState != null){
-                    swifeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
+                    swipeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
                     itemRV.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
                     errorLayout.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
 
@@ -159,8 +156,8 @@ public class ItemsList extends Fragment {
         uibinder = ButterKnife.bind(this, view);
         itemRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         itemRV.setAdapter(itemsAdapter);
-        swifeToRefresh = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
-        swifeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeToRefresh = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
+        swipeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 postViewModel.onRefresh();

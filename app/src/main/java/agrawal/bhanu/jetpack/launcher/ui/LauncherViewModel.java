@@ -17,11 +17,13 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
+import agrawal.bhanu.jetpack.launcher.model.AppContainer;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.model.Folder;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
 
 public class LauncherViewModel extends AndroidViewModel {
 
@@ -59,11 +61,6 @@ public class LauncherViewModel extends AndroidViewModel {
         return folders;
     }
 
-    public void updateDefaultPage(AppsAndFolder appsAndFolder, int position){
-        getFolders().getValue().set(position, appsAndFolder);
-        getFolders().setValue(getFolders().getValue());
-        appsRepository.saveFoldersInfo(getFolders().getValue());
-    }
 
     public MutableLiveData<AppsInfo> getAppsInfo() {
 
@@ -139,5 +136,60 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public Drawable getAppIcon(String appPackage) {
         return appsRepository.getAppIcon(appPackage);
+    }
+
+    public AppDTO getAppByContainer(AppContainer appContainer) {
+        return appsRepository.getAppByContainerId(getAppsInfo().getValue().getApps(), appContainer);
+    }
+
+    public void addToFolder(AppDTO app, String folderId) {
+        if(app.getFolderIds().indexOf(folderId) < 0){
+            app.getFolderIds().add(folderId);
+            getAppsInfo().setValue(getAppsInfo().getValue());
+            appsRepository.saveAppsUsageInfo(getAppsInfo().getValue().getApps());
+        }
+    }
+
+    public void addToHome(AppDTO app, int position, AddToHomeCallback addToHomeCallback){
+
+        if(position>=0 && position<getFolders().getValue().size()){
+            getFolders().getValue().set(position, new AppContainer(app.getAppPackage()));
+            getFolders().setValue(getFolders().getValue());
+            appsRepository.saveFoldersInfo(getFolders().getValue());
+            addToFolder(app, app.getAppPackage());
+            addToHomeCallback.onSuccess();
+        }
+        else {
+            addToHomeCallback.onError("No space left on Home");
+        }
+
+    }
+
+    public void addToHome(Folder folder, int position){
+    }
+
+    public int getEmptyPositionOnDefaultPage() {
+
+        for(AppsAndFolder appsAndFolder: getFolders().getValue()){
+            if(appsAndFolder instanceof AppContainer &&
+                    appsRepository.getAppByContainerId(mCurrentApps.getValue().getApps(),
+                            (AppContainer) appsAndFolder) == null){
+
+                return getFolders().getValue().indexOf(appsAndFolder);
+
+            }
+            else if(appsAndFolder instanceof Folder &&
+                    appsRepository.getAppsByFolderId(mCurrentApps.getValue().getApps(), ((Folder)appsAndFolder).getFolderId()).isEmpty()){
+                return getFolders().getValue().indexOf(appsAndFolder);
+            }
+        }
+
+        return -1;
+    }
+
+    public void removeFromHome(int position) {
+        AppsAndFolder appsAndFolder = getFolders().getValue().get(position);
+        getFolders().getValue().set(position, new AppContainer(""));
+        getFolders().setValue(getFolders().getValue());
     }
 }

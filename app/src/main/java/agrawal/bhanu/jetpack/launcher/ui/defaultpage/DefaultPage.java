@@ -28,9 +28,11 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.model.AppContainer;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
@@ -141,7 +143,10 @@ public class DefaultPage extends Fragment {
         });
 
         ItemTouchHelper.Callback _ithCallback = new ItemTouchHelper.Callback() {
+
             //and in your imlpementaion of
+
+
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 // get the viewHolder's and target's positions in your adapter data, swap them
                 Collections.swap(mAppsModel.getFolders().getValue(), viewHolder.getAdapterPosition(), target.getAdapterPosition());
@@ -165,14 +170,15 @@ public class DefaultPage extends Fragment {
         };
 
         ith = new ItemTouchHelper(_ithCallback);
-//
-//        final Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mAppsModel.updateDefaultPage(mAppsModel.getAppsInfo().getValue().getGoogleApp(), 5);
-//            }
-//        }, 2000);
+
+/*        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAppsModel.updateDefaultPage(new AppContainer("dsfsdf"), 5);
+                mAppsModel.addToFolder(mAppsModel.getAppsInfo().getValue().getApps().get(2), "dsfsdf");
+            }
+        }, 5000);*/
 
     }
 

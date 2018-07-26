@@ -10,11 +10,14 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -23,8 +26,10 @@ import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
 
-public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder> {
+public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
     private final Context context;
     private final LauncherViewModel mAppsModel;
@@ -53,58 +58,6 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
         mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
     }
 
-    public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView appNameTV;
-        public ImageView appIconIV;
-        public ConstraintLayout parentLayout;
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        private PackageManager pm;
-
-        public AppViewHolder(View view, int viewType) {
-            super(view);
-            appNameTV = (TextView) view.findViewById(R.id.app_name);
-            appNameTV.setVisibility(viewType == ALL_APPS || viewType == FOLDER_DIALOG? View.VISIBLE: View.GONE);
-            appIconIV = (ImageView) view.findViewById(R.id.app_icon);
-            parentLayout = (ConstraintLayout) view.findViewById(R.id.parentlayout);
-            if(viewType != FOLDER){
-                parentLayout.setOnClickListener(this);
-                parentLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        int position = getAdapterPosition();
-                        intent.setData(Uri.parse("package:" + apps.get(position).getAppPackage()));
-                        context.startActivity(intent);
-                        return true;
-                    }
-                });
-            }
-
-        }
-
-        @Override
-        public void onClick(View view) {
-            int position = getAdapterPosition();
-            pm = context.getPackageManager();
-            try{
-                if(getItemViewType() == FOLDER_DIALOG){
-                    ((Activity)context).onBackPressed();
-                }
-                Intent intent = pm.getLaunchIntentForPackage(apps.get(position).getAppPackage());
-                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                if(intent == null){
-                    throw new PackageManager.NameNotFoundException();
-                }else{
-                    mAppsModel.onAppSelected(apps.get(position));
-                    context.startActivity(intent);
-                }
-            }catch(PackageManager.NameNotFoundException e){
-            }
-            catch(Exception e){
-            }
-
-        }
-    }
 
     @Override
     public int getItemViewType(int position) {
@@ -121,19 +74,19 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
             case ALL_APPS:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                return new AppViewHolder(itemView, viewType, context);
             case HOME:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_app_home, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                return new AppViewHolder(itemView, viewType, context);
             case FOLDER:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_app_folder, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                return new AppViewHolder(itemView, viewType, context);
             default:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType);
+                return new AppViewHolder(itemView, viewType, context);
 
         }
 
@@ -145,7 +98,8 @@ public class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.AppViewHolder>
     @Override
     public void onBindViewHolder(AppViewHolder holder, final int position) {
         holder.appNameTV.setText(apps.get(position).getAppName());
-        holder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(apps.get(position).getAppPackage()));
+        holder.appIconIV.setImageDrawable(apps.get(position).getIcon());
+        holder.setApp(apps.get(position));
     }
 
 

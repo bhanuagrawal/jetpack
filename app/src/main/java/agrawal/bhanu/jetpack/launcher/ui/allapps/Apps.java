@@ -9,15 +9,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
@@ -89,6 +94,7 @@ public class Apps extends Fragment {
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
+
     }
 
     @Override
@@ -101,6 +107,7 @@ public class Apps extends Fragment {
         appRV.setAdapter(appAppsAdapter);
         return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

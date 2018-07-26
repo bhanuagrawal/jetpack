@@ -15,4 +15,8 @@ public class AppsAndFolder implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
+
+    public AppsAndFolder(String type) {
+        this.type = type;
+    }
 }

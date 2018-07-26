@@ -8,15 +8,37 @@ import java.util.Date;
 
 import agrawal.bhanu.jetpack.reddit.model.Data;
 
-public class AppDTO extends AppsAndFolder implements Serializable {
+public class AppDTO implements Serializable {
     
     private String appName;
     private String appPackage;
     private Date lastUsed;
     private int clicks;
     private ArrayList<String> folderIds;
+    private boolean isDefault;
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
+    }
+
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Drawable icon) {
+        this.icon = icon;
+    }
+
+    private Drawable icon;
 
     public ArrayList<String> getFolderIds() {
+        if(folderIds == null){
+            folderIds = new ArrayList<>();
+        }
         return folderIds;
     }
 
@@ -29,11 +51,9 @@ public class AppDTO extends AppsAndFolder implements Serializable {
         lastUsed = app.getLastUsed();
         clicks = app.getClicks();
         folderIds = app.getFolderIds();
-        type = AppsAndFolder.APP;
     }
 
     public AppDTO() {
-        type = AppsAndFolder.APP;
     }
 
     public Date getLastUsed() {

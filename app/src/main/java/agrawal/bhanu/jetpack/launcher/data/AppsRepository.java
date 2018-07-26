@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
@@ -33,6 +34,7 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.launcher.model.AppContainer;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
@@ -64,7 +66,7 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(app.loadLabel(packageManager).toString());
             appDTO.setAppPackage(app.activityInfo.packageName);
-            //appDTO.setAppIcon(app.loadIcon(packageManager));
+            appDTO.setIcon(getAppIcon(app.activityInfo.packageName));
             AppDTO appUsage = getAppFromPackage(appsUsageInfo, app.activityInfo.packageName);
             if(appUsage != null){
                 appDTO.setClicks(appUsage.getClicks());
@@ -72,9 +74,6 @@ public class AppsRepository {
                 appDTO.setFolderIds(appUsage.getFolderIds());
             }
 
-            if(appDTO.getFolderIds() == null){
-                appDTO.setFolderIds(new ArrayList<String>());
-            }
             addOrRemoveFromfrequentApps(appDTO);
             apps.add(appDTO);
         }
@@ -138,6 +137,7 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(callApps.get(0).loadLabel(packageManager).toString());
             appDTO.setAppPackage(callApps.get(0).activityInfo.packageName);
+            appDTO.setIcon(getAppIcon(callApps.get(0).activityInfo.packageName));
             return appDTO;
         }
 
@@ -154,6 +154,7 @@ public class AppsRepository {
         return null;
     }
 
+
     private AppDTO getDefaultInternetApp(Intent intent) {
         List<ResolveInfo> browserList;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -166,6 +167,7 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(browserList.get(0).loadLabel(packageManager).toString());
             appDTO.setAppPackage(browserList.get(0).activityInfo.packageName);
+            appDTO.setIcon(getAppIcon(browserList.get(0).activityInfo.packageName));
             return appDTO;
         }
 
@@ -204,6 +206,7 @@ public class AppsRepository {
             AppDTO appDTO = new AppDTO();
             appDTO.setAppName(resolveInfo.loadLabel(packageManager).toString());
             appDTO.setAppPackage(resolveInfo.activityInfo.packageName);
+            appDTO.setIcon(getAppIcon(resolveInfo.activityInfo.packageName));
             return appDTO;
         }
         return null;
@@ -307,15 +310,13 @@ public class AppsRepository {
         ArrayList<AppsAndFolder> prevAppsAndFolders = getFolderFromMemory();
 
         if(prevAppsAndFolders.isEmpty()){
-            Folder frequestApps = new Folder();
-            frequestApps.setFolderId(MainActivity.FREQUENT_APPS);
-            frequestApps.setFolderName("Frequent Apps");
-
+            Folder frequestApps = new Folder("Frequent Apps", MainActivity.FREQUENT_APPS);
+            frequestApps.setRemovable(false);
 
             ArrayList<AppsAndFolder> foldersList = new ArrayList<>();
 
             for(int i=0; i<4*(getAppRowCount())-1; i++){
-                Folder f = new Folder();
+                Folder f = new Folder("", "");
                 foldersList.add(f);
             }
 
@@ -332,24 +333,43 @@ public class AppsRepository {
     }
 
     private ArrayList<AppsAndFolder> getFolderFromMemory() {
-       // return new ArrayList<>();
+        //return new ArrayList<>();
 
         RuntimeTypeAdapterFactory<AppsAndFolder> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(AppsAndFolder.class, "type")
-                .registerSubtype(AppDTO.class, AppsAndFolder.APP)
+                .registerSubtype(AppContainer.class, AppsAndFolder.APP)
                 .registerSubtype(Folder.class, AppsAndFolder.FOLDER);
 
         Gson gsonRuntimeTypeAdapterFactory = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
-        return gsonRuntimeTypeAdapterFactory.fromJson(sharedPreferences.getString("folders", "[]"), new TypeToken<ArrayList<AppsAndFolder>>(){}.getType());
+        ArrayList<AppsAndFolder> appsFolders =  gsonRuntimeTypeAdapterFactory.fromJson(sharedPreferences.getString("folders", "[]"), new TypeToken<ArrayList<AppsAndFolder>>(){}.getType());
+        for(AppsAndFolder appsAndFolder: appsFolders){
+            if(appsAndFolder instanceof AppContainer){
+                appsAndFolder.setType(AppsAndFolder.APP);
+            }
+            else if(appsAndFolder instanceof Folder){
+                appsAndFolder.setType(AppsAndFolder.FOLDER);
+            }
+        }
+        return appsFolders;
     }
 
     public void saveFoldersInfo(ArrayList<AppsAndFolder> appsFolders) {
 
         RuntimeTypeAdapterFactory<AppsAndFolder> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(AppsAndFolder.class, "type")
-                .registerSubtype(AppDTO.class, AppsAndFolder.APP)
+                .registerSubtype(AppContainer.class, AppsAndFolder.APP)
                 .registerSubtype(Folder.class, AppsAndFolder.FOLDER);
         Gson gsonRuntimeTypeAdapterFactory = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
         sharedPreferences.edit().putString("folders", gsonRuntimeTypeAdapterFactory.toJson(appsFolders)).commit();
+    }
+
+    public AppDTO getAppByContainerId(ArrayList<AppDTO> apps, AppContainer appContainer) {
+
+        for(AppDTO appDTO: apps){
+            if(appDTO.getFolderIds().indexOf(appContainer.getContainerId()) >= 0){
+                return appDTO;
+            }
+        }
+        return null;
     }
 }
