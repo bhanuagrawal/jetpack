@@ -45,6 +45,9 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private ArrayList<AppsAndFolder> appsFolder;
     public static final int FOLDER = 2;
 
+    public ArrayList<AppsAndFolder> getAppsFolder() {
+        return appsFolder;
+    }
 
     public void setAppsFolder(ArrayList<AppsAndFolder> apps) {
         this.appsFolder = apps;
@@ -72,7 +75,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         public void bindTo(Folder folder) {
-            frameLayout.setVisibility(mAppsModel.getAppsByFolderId(folder.getFolderId()).isEmpty()?View.INVISIBLE:View.VISIBLE);
+            itemView.setVisibility(mAppsModel.getAppsByFolderId(folder.getFolderId()).isEmpty()?View.INVISIBLE:View.VISIBLE);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
 
                 if(folder.getFolderId() != null && !folder.getFolderId().isEmpty()){
@@ -87,7 +90,8 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
 
-            if(((Folder)appsFolder.get(getAdapterPosition())).getRemovable()){
+            if(((Folder)appsFolder.get(getAdapterPosition())).getRemovable() &&
+                    !((Folder)appsFolder.get(getAdapterPosition())).getFolderId().isEmpty()){
                 MenuItem add_to_home = contextMenu.add("Remove");
                 add_to_home.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
@@ -146,7 +150,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             AppViewHolder viewHolder = (AppViewHolder)holder;
             AppDTO app = mAppsModel.getAppByContainer(((AppContainer)appsFolder.get(position)));
-            viewHolder.parentLayout.setVisibility(app == null?View.GONE:View.VISIBLE);
+            viewHolder.itemView.setVisibility(app == null?View.GONE:View.VISIBLE);
             if(app != null){
                 viewHolder.appNameTV.setText(app.getAppName());
                 viewHolder.appIconIV.setImageDrawable(app.getIcon());

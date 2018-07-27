@@ -35,6 +35,11 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     private AppDTO app;
     Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
     private PackageManager pm;
+    private ContextMenu contextMenu;
+
+    public ContextMenu getContextMenu() {
+        return contextMenu;
+    }
 
     public AppViewHolder(View view, int viewType, Context context) {
         super(view);
@@ -80,6 +85,12 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
 
+        this.setContextMenu(contextMenu);
+
+        if(app == null){
+            return;
+        }
+
         if(getItemViewType() == AppsAdapter.ALL_APPS){
             MenuItem add_to_home = contextMenu.add("Add To Home");
             add_to_home.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -124,6 +135,10 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
                 return false;
             }
         });
+    }
+
+    private void setContextMenu(ContextMenu contextMenu) {
+        this.contextMenu = contextMenu;
     }
 
 

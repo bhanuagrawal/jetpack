@@ -36,6 +36,7 @@ import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
+import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 /**
@@ -137,7 +138,7 @@ public class DefaultPage extends Fragment {
         mAppsModel.getFolders().observe(this, new Observer<ArrayList<AppsAndFolder>>() {
             @Override
             public void onChanged(@Nullable ArrayList<AppsAndFolder> appsFolder) {
-                appsFolderLayoutManager.setSpanCount(4);
+                appsFolderLayoutManager.setSpanCount(mAppsModel.getColumn_count());
                 appsFolderAdapter.setAppsFolder(appsFolder);
             }
         });
@@ -147,11 +148,45 @@ public class DefaultPage extends Fragment {
             //and in your imlpementaion of
 
 
+            @Override
+            public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
+                super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
+            }
+
+            @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                // get the viewHolder's and target's positions in your adapter data, swap them
-                Collections.swap(mAppsModel.getFolders().getValue(), viewHolder.getAdapterPosition(), target.getAdapterPosition());
+
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+
+
+                if(viewHolder.itemView.getVisibility() != View.VISIBLE){
+                    return false;
+                }
+
+
+
+                    // get the viewHolder's and target's positions in your adapter data, swap them
+                if(viewHolder instanceof AppViewHolder){
+/*                    if(((AppViewHolder)viewHolder).getContextMenu() != null){
+                    }*/
+
+                    ((AppViewHolder)viewHolder).getContextMenu().close();
+
+                }
+
+                if (fromPosition < toPosition) {
+                    for (int i = fromPosition; i < toPosition; i++) {
+                        Collections.swap(mAppsModel.getFolders().getValue(), i, i + 1);
+                    }
+                } else {
+                    for (int i = fromPosition; i > toPosition; i--) {
+                        Collections.swap(mAppsModel.getFolders().getValue(), i, i - 1);
+                    }
+                }
+                appsFolderAdapter.notifyItemMoved(fromPosition, toPosition);
+
                 // and notify the adapter that its dataset has changed
-                appsFolderAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
                 mAppsModel.onFoldersChange();
                 return true;
             }
@@ -161,12 +196,18 @@ public class DefaultPage extends Fragment {
                 //TODO
             }
 
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
             //defines the enabled move directions in each state (idle, swiping, dragging).
             @Override
             public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
-                        ItemTouchHelper.DOWN | ItemTouchHelper.UP | ItemTouchHelper.START | ItemTouchHelper.END);
+                        ItemTouchHelper.DOWN | ItemTouchHelper.UP | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
             }
+
+
         };
 
         ith = new ItemTouchHelper(_ithCallback);

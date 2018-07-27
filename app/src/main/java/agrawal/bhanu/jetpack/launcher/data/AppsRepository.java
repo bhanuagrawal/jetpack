@@ -223,10 +223,10 @@ public class AppsRepository {
 
         int height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
         float pixeldpi = Resources.getSystem().getDisplayMetrics().density;
-        int itemHeight_dp = 100;
+        int itemHeight_dp = 95;
         float itemHeight_px = pixeldpi * itemHeight_dp;
 
-        return (int)(height_px/itemHeight_px) - 1;
+        return (int)(height_px/itemHeight_px);
     }
 
     public int getAppColumnCount() {
@@ -238,10 +238,10 @@ public class AppsRepository {
 
         int width_px =Resources.getSystem().getDisplayMetrics().widthPixels;
         float pixeldpi = Resources.getSystem().getDisplayMetrics().density;
-        int itemWidth_dp = 80;
+        int itemWidth_dp = 85;
         float itemWidth_px = pixeldpi * itemWidth_dp;
         //return  1;
-        return (int)(width_px/itemWidth_px) -1;
+        return (int)(width_px/itemWidth_px);
     }
 
     public void saveAppsUsageInfo(ArrayList<AppDTO> apps) {
@@ -315,7 +315,7 @@ public class AppsRepository {
 
             ArrayList<AppsAndFolder> foldersList = new ArrayList<>();
 
-            for(int i=0; i<4*(getAppRowCount())-1; i++){
+            for(int i=0; i<getAppColumnCount()*(getAppRowCount()-2)-1; i++){
                 Folder f = new Folder("", "");
                 foldersList.add(f);
             }
