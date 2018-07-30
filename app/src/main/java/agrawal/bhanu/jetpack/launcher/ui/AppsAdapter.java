@@ -1,39 +1,25 @@
 package agrawal.bhanu.jetpack.launcher.ui;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
-import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
 
 public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
     private final Context context;
     private final LauncherViewModel mAppsModel;
-    private ArrayList<AppDTO> apps;
+    private ArrayList<App> apps;
     public static final int HOME = 0;
     public static final int ALL_APPS = 1;
     public static final int FOLDER = 2;
@@ -41,17 +27,17 @@ public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     private int viewType;
 
 
-    public ArrayList<AppDTO> getApps() {
+    public ArrayList<App> getApps() {
         return apps;
     }
 
-    public void setApps(ArrayList<AppDTO> apps) {
+    public void setApps(ArrayList<App> apps) {
         this.apps = apps;
         Log.d("applistsize", String.valueOf(apps.size()));
         notifyDataSetChanged();
     }
 
-    public AppsAdapter(Context context, ArrayList<AppDTO> apps, int viewType) {
+    public AppsAdapter(Context context, ArrayList<App> apps, int viewType) {
         this.context = context;
         this.apps = apps;
         this.viewType = viewType;

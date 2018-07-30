@@ -11,18 +11,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.AppUtils;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
-import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
@@ -84,7 +79,7 @@ public class Apps extends Fragment {
         }
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
-        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.ALL_APPS);
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.ALL_APPS);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {

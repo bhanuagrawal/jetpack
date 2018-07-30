@@ -21,7 +21,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
@@ -90,7 +90,7 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
             folderId = getArguments().getString(ARG_PARAM1);
             folderName = getArguments().getString(ARG_PARAM2);
         }
-        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER_DIALOG);
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER_DIALOG);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
 
         mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {

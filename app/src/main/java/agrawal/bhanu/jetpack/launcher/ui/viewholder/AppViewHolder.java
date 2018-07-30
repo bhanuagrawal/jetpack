@@ -6,30 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.model.AppContainer;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
-import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.AppsFolderAdapter;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
@@ -44,7 +33,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     public TextView appNameTV;
     public ImageView appIconIV;
     public ConstraintLayout parentLayout;
-    private AppDTO app;
+    private App app;
     Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
     private PackageManager pm;
     public PopupWindow popupWindow;
@@ -101,7 +90,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
 
 
 
-    public void setApp(AppDTO app) {
+    public void setApp(App app) {
         this.app = app;
     }
 
@@ -121,7 +110,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
                 @Override
                 public void onClick(View view) {
                     popupWindow.dismiss();
-                    mAppsModel.addToHome(app, mAppsModel.getEmptyPositionOnDefaultPage(), new AddToHomeCallback() {
+                    mAppsModel.addToHome(app, new AddToHomeCallback() {
                         @Override
                         public void onSuccess() {
                             ((FragmentActivity)context).onBackPressed();

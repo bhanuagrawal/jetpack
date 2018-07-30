@@ -9,27 +9,28 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.AppUtils;
+import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
-import agrawal.bhanu.jetpack.launcher.model.AppContainer;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
-import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
+import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
+import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
+import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
-import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
 
 public class LauncherViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
-    private MutableLiveData<ArrayList<AppsAndFolder>> folders;
+    private MutableLiveData<ArrayList<Widget>> folders;
     private MutableLiveData<Drawable> wallpaper;
     private Application application;
     @Inject
@@ -49,9 +50,9 @@ public class LauncherViewModel extends AndroidViewModel {
         ((MyApp)application).getLocalDataComponent().inject(this);
     }
 
-    public MutableLiveData<ArrayList<AppsAndFolder>> getFolders() {
+    public MutableLiveData<ArrayList<Widget>> getFolders() {
         if(folders == null){
-            folders = new MutableLiveData<ArrayList<AppsAndFolder>>();
+            folders = new MutableLiveData<ArrayList<Widget>>();
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -67,7 +68,7 @@ public class LauncherViewModel extends AndroidViewModel {
 
         if (mCurrentApps == null) {
             mCurrentApps = new MutableLiveData<AppsInfo>();
-            mCurrentApps.setValue(new AppsInfo(new ArrayList<AppDTO>(), new ArrayList<AppDTO>()));
+            mCurrentApps.setValue(new AppsInfo(new ArrayList<App>(), new ArrayList<App>()));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -82,7 +83,7 @@ public class LauncherViewModel extends AndroidViewModel {
 
         if (mCurrentApps == null) {
             mCurrentApps = new MutableLiveData<AppsInfo>();
-            mCurrentApps.setValue(new AppsInfo(new ArrayList<AppDTO>(), new ArrayList<AppDTO>()));
+            mCurrentApps.setValue(new AppsInfo(new ArrayList<App>(), new ArrayList<App>()));
         }
         appsRepository.fetchApps(mCurrentApps);
     }
@@ -113,13 +114,14 @@ public class LauncherViewModel extends AndroidViewModel {
         return wallpaper;
     }
 
-    public void onAppSelected(AppDTO app) {
-        app = appsRepository.getAppFromPackage(getAppsInfo().getValue().getApps(), app.getAppPackage());
-        app.setClicks(app.getClicks() + 1);
-        app.setLastUsed(new Date());
+    public void onAppSelected(App app) {
+
+        App afterChange = new App(app);
+        afterChange.setClicks(app.getClicks() + 1);
+        afterChange.setLastUsed(new Date());
+
+        appsRepository.updateApp(app, afterChange);
         appsRepository.addOrRemoveFromfrequentApps(app);
-        getAppsInfo().setValue(getAppsInfo().getValue());
-        saveAppsUsageInfo();
     }
 
     public void saveAppsUsageInfo() {
@@ -127,37 +129,38 @@ public class LauncherViewModel extends AndroidViewModel {
 
     }
 
-    public ArrayList<AppDTO> getAppsByFolderId(String folderId) {
-        return appsRepository.getAppsByFolderId(getAppsInfo().getValue().getApps(), folderId);
+    public ArrayList<App> getAppsByFolderId(String folderId) {
+        return appsRepository.getAppsByFolderId(folderId);
     }
 
     public void onFoldersChange() {
-        appsRepository.saveFoldersInfo(getFolders().getValue());
+        ArrayList<Widget> widgets = getFolders().getValue();
+        appsRepository.deleteAllWidgets();
+        appsRepository.saveFoldersInfo(widgets);
     }
 
     public Drawable getAppIcon(String appPackage) {
         return appsRepository.getAppIcon(appPackage);
     }
 
-    public AppDTO getAppByContainer(AppContainer appContainer) {
-        return appsRepository.getAppByContainerId(getAppsInfo().getValue().getApps(), appContainer);
+    public App getAppByContainer(String appContainerId) {
+        return appsRepository.getAppByContainerId(appContainerId);
     }
 
-    public void addToFolder(AppDTO app, String folderId) {
-        if(app.getFolderIds().indexOf(folderId) < 0){
-            app.getFolderIds().add(folderId);
-            getAppsInfo().setValue(getAppsInfo().getValue());
-            appsRepository.saveAppsUsageInfo(getAppsInfo().getValue().getApps());
-        }
+    public void addToFolder(App app, String folderId) {
+        appsRepository.addToFolder(app, folderId, getAppsInfo());
     }
 
-    public void addToHome(AppDTO app, int position, AddToHomeCallback addToHomeCallback){
+    public void addToHome(App app, AddToHomeCallback addToHomeCallback){
 
+
+        int position = getEmptyPositionOnDefaultPage();
         if(position>=0 && position<getFolders().getValue().size()){
-            getFolders().getValue().set(position, new AppContainer(app.getAppPackage()));
-            getFolders().setValue(getFolders().getValue());
-            appsRepository.saveFoldersInfo(getFolders().getValue());
-            addToFolder(app, app.getAppPackage());
+
+            AppContainer appContainer = new AppContainer(String.valueOf(new Timestamp(new Date().getTime())), app.getAppPackage());
+            appsRepository.insertAppContainer(appContainer);
+            Widget widget = new Widget(appContainer, position);
+            appsRepository.updateWidgets(widget);
             addToHomeCallback.onSuccess();
         }
         else {
@@ -171,18 +174,18 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public int getEmptyPositionOnDefaultPage() {
 
-        for(AppsAndFolder appsAndFolder: getFolders().getValue()){
-            if(appsAndFolder instanceof AppContainer &&
-                    appsRepository.getAppByContainerId(mCurrentApps.getValue().getApps(),
-                            (AppContainer) appsAndFolder) == null){
+        for(Widget widget : getFolders().getValue()){
 
-                return getFolders().getValue().indexOf(appsAndFolder);
+            if(widget.getType().equals(Constants.APP_CONTAINER) &&
+                    appsRepository.getAppByContainerId(widget.getAppContainerId()) == null){
+
+                return getFolders().getValue().indexOf(widget);
 
             }
-            else if(appsAndFolder instanceof Folder &&
-                    ((Folder) appsAndFolder).getRemovable() &&
-                    appsRepository.getAppsByFolderId(mCurrentApps.getValue().getApps(), ((Folder)appsAndFolder).getFolderId()).isEmpty()){
-                return getFolders().getValue().indexOf(appsAndFolder);
+            else if(widget.getType().equals(Constants.FOLDER)
+                    && widget.getRemovable() &&
+                    appsRepository.getAppsByFolderId(widget.getFolderId()).isEmpty()){
+                return getFolders().getValue().indexOf(widget);
             }
         }
 
@@ -190,12 +193,14 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public void removeFromHome(int position) {
-        getFolders().getValue().set(position, new AppContainer(""));
-        getFolders().setValue(getFolders().getValue());
-        appsRepository.saveFoldersInfo(getFolders().getValue());
+        appsRepository.removeFromHome(position, getAppsInfo());
     }
 
     public int getAppsPerPage() {
         return appsRepository.getAppColumnCount()*appsRepository.getAppRowCount();
+    }
+
+    public Folder getFolderById(String folderId) {
+        return appsRepository.getFolderById(folderId);
     }
 }

@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -28,11 +27,9 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.model.AppContainer;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
-import agrawal.bhanu.jetpack.launcher.model.AppsAndFolder;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
+import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
-import agrawal.bhanu.jetpack.launcher.model.Folder;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
@@ -112,13 +109,13 @@ public class DefaultPage extends Fragment {
 
         ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
-        appsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.HOME);
+        appsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.HOME);
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         appsFolderLayoutManager  =new GridLayoutManager(getActivity(), 1);
         appsFolderLayoutManager.setReverseLayout(true);
 //        appsFolderLayoutManager.setStackFromEnd(true);
-        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<AppsAndFolder>());
+        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<Widget>());
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {;
@@ -137,9 +134,9 @@ public class DefaultPage extends Fragment {
         });
 
         folderManager = new FolderManager(getContext());
-        mAppsModel.getFolders().observe(this, new Observer<ArrayList<AppsAndFolder>>() {
+        mAppsModel.getFolders().observe(this, new Observer<ArrayList<Widget>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<AppsAndFolder> appsFolder) {
+            public void onChanged(@Nullable ArrayList<Widget> appsFolder) {
                 appsFolderLayoutManager.setSpanCount(mAppsModel.getColumn_count());
                 appsFolderAdapter.setAppsFolder(appsFolder);
             }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
-import agrawal.bhanu.jetpack.launcher.model.AppDTO;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
@@ -103,7 +103,7 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
         }
 
         layoutManager = new GridLayoutManager(getActivity(), 1);
-        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<AppDTO>(), AppsAdapter.FOLDER);
+        appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
             @Override
