@@ -90,7 +90,7 @@ public class AppList extends Fragment{
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {
-                mAdapter.setNUM_ITEMS(AppUtils.getNoOfPages(appsInfo));
+                mAdapter.setNUM_ITEMS(AppUtils.getNoOfPages(appsInfo, mAppsModel.getAppsPerPage()));
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
@@ -103,28 +103,6 @@ public class AppList extends Fragment{
         appsViewPager = (ViewPager) rootView.findViewById(R.id.all_appps_viewpager);
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabDots);
         appsViewPager.setAdapter(mAdapter);
-/*        Field mFlingDistance;
-        try {
-            mFlingDistance = ViewPager.class.getDeclaredField("mFlingDistance");
-            mFlingDistance.setAccessible(true);
-            mFlingDistance.set(appsViewPager, 100);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }*/
-
-
-/*        try {
-            Field mScroller;
-            mScroller = ViewPager.class.getDeclaredField("mScroller");
-            mScroller.setAccessible(true);
-            FixedSpeedScroller scroller = new FixedSpeedScroller(appsViewPager.getContext(), new DecelerateInterpolator());
-            mScroller.set(appsViewPager, scroller);
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (IllegalAccessException e) {
-        }*/
         tabLayout.setupWithViewPager(appsViewPager);
         return rootView;
     }

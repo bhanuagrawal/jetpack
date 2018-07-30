@@ -90,9 +90,6 @@ public class AppsRepository {
                 return appDTO.getAppName().compareTo(t1.getAppName());
             }
         });
-        appsInfo.setRow_count(getAppRowCount());
-        appsInfo.setColumn_count(getAppColumnCount());
-        appsInfo.setApps_per_page(appsInfo.getColumn_count()*appsInfo.getRow_count());
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);

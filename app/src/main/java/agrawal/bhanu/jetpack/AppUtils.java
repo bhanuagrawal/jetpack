@@ -16,8 +16,8 @@ public class AppUtils {
         return new ArrayList<AppDTO>(appsInfo.getApps().subList(position * apps_per_page, appsInfo.getApps().size() > position * apps_per_page + apps_per_page ? position * apps_per_page + apps_per_page : appsInfo.getApps().size()));
     }
 
-    public static int getNoOfPages(AppsInfo appsInfo) {
-        return (int) Math.ceil((float) appsInfo.getApps().size() / appsInfo.getApps_per_page());
+    public static int getNoOfPages(AppsInfo appsInfo, int appsPerPage) {
+        return (int) Math.ceil((float) appsInfo.getApps().size() / appsPerPage);
     }
 
     public static boolean checkIfAlreadyhavePermission(Application application) {
