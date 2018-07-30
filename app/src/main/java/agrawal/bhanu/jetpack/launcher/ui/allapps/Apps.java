@@ -104,6 +104,7 @@ public class Apps extends Fragment {
         View view = inflater.inflate(R.layout.fragment_apps, container, false);
         appRV = (RecyclerView)view.findViewById(R.id.applist);
         appRV.setLayoutManager(layoutManager);
+        registerForContextMenu(appRV);
         appRV.setAdapter(appAppsAdapter);
         return view;
     }
@@ -131,6 +132,10 @@ public class Apps extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     }
 
     /**

@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.Executor;
 
@@ -160,7 +161,7 @@ public class LauncherViewModel extends AndroidViewModel {
             addToHomeCallback.onSuccess();
         }
         else {
-            addToHomeCallback.onError("No space left on Home");
+            addToHomeCallback.onError("No space left at Home");
         }
 
     }
@@ -179,6 +180,7 @@ public class LauncherViewModel extends AndroidViewModel {
 
             }
             else if(appsAndFolder instanceof Folder &&
+                    ((Folder) appsAndFolder).getRemovable() &&
                     appsRepository.getAppsByFolderId(mCurrentApps.getValue().getApps(), ((Folder)appsAndFolder).getFolderId()).isEmpty()){
                 return getFolders().getValue().indexOf(appsAndFolder);
             }

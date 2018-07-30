@@ -116,6 +116,8 @@ public class DefaultPage extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         appsFolderLayoutManager  =new GridLayoutManager(getActivity(), 1);
+        appsFolderLayoutManager.setReverseLayout(true);
+//        appsFolderLayoutManager.setStackFromEnd(true);
         appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<AppsAndFolder>());
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
@@ -171,7 +173,7 @@ public class DefaultPage extends Fragment {
 /*                    if(((AppViewHolder)viewHolder).getContextMenu() != null){
                     }*/
 
-                    ((AppViewHolder)viewHolder).getContextMenu().close();
+                    ((AppViewHolder)viewHolder).popupWindow.dismiss();
 
                 }
 
@@ -238,6 +240,7 @@ public class DefaultPage extends Fragment {
         defaultApps.setAdapter(appsAdapter);
 
         appsFolderRecyclerview.setLayoutManager(appsFolderLayoutManager);
+
         appsFolderRecyclerview.setAdapter(appsFolderAdapter);
         ith.attachToRecyclerView(appsFolderRecyclerview);
 

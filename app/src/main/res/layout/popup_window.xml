@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:beer="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true"
+    android:padding="3dp"
+    android:id="@+id/parentlayout"
+    android:background="@drawable/popup_bg"
+    >
+
+
+    <TextView
+        android:id="@+id/addToHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add To Home"
+        android:textColor="#000"
+        android:textSize="15dp"
+        android:padding="10dp"
+        android:visibility="gone"
+        beer:layout_constraintLeft_toLeftOf="parent" />
+
+
+    <TextView
+        android:id="@+id/remove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="Remove"
+        android:textColor="#000"
+        android:textSize="15dp"
+        android:visibility="gone"
+        android:padding="10dp"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintTop_toBottomOf="@id/addToHome" />
+
+    <TextView
+        android:id="@+id/infoUninstall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Info/Uninstall"
+        android:textColor="#000"
+        android:textSize="15dp"
+        android:padding="10dp"
+        android:visibility="gone"
+        beer:layout_constraintLeft_toLeftOf="parent"
+        beer:layout_constraintTop_toBottomOf="@id/remove" />
+
+
+
+
+</android.support.constraint.ConstraintLayout>

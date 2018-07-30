@@ -6,26 +6,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.model.AppContainer;
 import agrawal.bhanu.jetpack.launcher.model.AppDTO;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
+import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.AppsFolderAdapter;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-        View.OnCreateContextMenuListener {
+        View.OnLongClickListener {
 
     private final Context context;
     private final LauncherViewModel mAppsModel;
@@ -35,16 +47,21 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     private AppDTO app;
     Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
     private PackageManager pm;
-    private ContextMenu contextMenu;
+    public PopupWindow popupWindow;
 
-    public ContextMenu getContextMenu() {
-        return contextMenu;
-    }
+    @BindView(R.id.addToHome)
+    TextView addToHome;
+
+    @BindView(R.id.remove)
+    TextView remove;
+
+    @BindView(R.id.infoUninstall)
+    TextView infoUninstall;
 
     public AppViewHolder(View view, int viewType, Context context) {
         super(view);
         if(viewType != AppsAdapter.FOLDER){
-            view.setOnCreateContextMenuListener(this);
+            view.setOnLongClickListener(this);
         }
         appNameTV = (TextView) view.findViewById(R.id.app_name);
         appNameTV.setVisibility(viewType == AppsAdapter.ALL_APPS || viewType == AppsAdapter.FOLDER_DIALOG || viewType == AppsFolderAdapter.APP_CONTAINER? View.VISIBLE: View.GONE);
@@ -55,12 +72,12 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         }
         this.context = context;
         mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
-
-
     }
 
     @Override
     public void onClick(View view) {
+
+
         int position = getAdapterPosition();
         pm = context.getPackageManager();
         try{
@@ -82,20 +99,28 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
 
     }
 
+
+
+    public void setApp(AppDTO app) {
+        this.app = app;
+    }
+
     @Override
-    public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+    public boolean onLongClick(View view) {
 
-        this.setContextMenu(contextMenu);
-
-        if(app == null){
-            return;
-        }
-
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View customView = layoutInflater.inflate(R.layout.popup_window,null);
+        ButterKnife.bind(this, customView);
+        popupWindow = new PopupWindow(customView, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow.showAsDropDown(appIconIV);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(true);
         if(getItemViewType() == AppsAdapter.ALL_APPS){
-            MenuItem add_to_home = contextMenu.add("Add To Home");
-            add_to_home.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            addToHome.setVisibility(View.VISIBLE);
+            addToHome.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
+                public void onClick(View view) {
+                    popupWindow.dismiss();
                     mAppsModel.addToHome(app, mAppsModel.getEmptyPositionOnDefaultPage(), new AddToHomeCallback() {
                         @Override
                         public void onSuccess() {
@@ -107,42 +132,34 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                         }
                     });
-                    return false;
                 }
             });
         }
+
+
         if(getItemViewType() == AppsFolderAdapter.APP_CONTAINER){
 
-            MenuItem add_to_home = contextMenu.add("Remove");
-            add_to_home.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            remove.setVisibility(View.VISIBLE);
+            remove.setOnClickListener(new View.OnClickListener() {
+
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
+                public void onClick(View view) {
+                    popupWindow.dismiss();
                     mAppsModel.removeFromHome(getAdapterPosition());
-                    return false;
                 }
             });
-
         }
 
-
-        MenuItem appInfo = contextMenu.add("Info/Uninstall");
-        appInfo.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        infoUninstall.setVisibility(View.VISIBLE);
+        infoUninstall.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                int position = getAdapterPosition();
+            public void onClick(View view) {
+                popupWindow.dismiss();
                 intent.setData(Uri.parse("package:" + app.getAppPackage()));
                 context.startActivity(intent);
-                return false;
             }
         });
-    }
 
-    private void setContextMenu(ContextMenu contextMenu) {
-        this.contextMenu = contextMenu;
-    }
-
-
-    public void setApp(AppDTO app) {
-        this.app = app;
+        return true;
     }
 }

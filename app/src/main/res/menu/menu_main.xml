@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/remove"
+        android:title="Remove"
+        android:visible="false"/>
     <item android:id="@+id/addToHome"
-        android:title="Add To Home" />
+        android:title="Add To Home"
+        android:visible="false"/>
+    <item android:id="@+id/infoUninstall"
+        android:title="Info/Uninstall"
+        android:visible="true"/>
 </menu>

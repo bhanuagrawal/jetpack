@@ -38,7 +38,7 @@ implements ItemsList.OnFragmentInteractionListener,
 
     private static final String BEER_DISPLAY_FRAGMENT = "sfdfdg";
     private static final String APP_LIST_FRAGMENT = "APPS_FRAGMENT";
-    private static final String HOME_FRAGMENT = "homefragment";
+    public static final String HOME_FRAGMENT = "homefragment";
     public static final String FREQUENT_APPS = "frequentFragment";
     public static final String APPS_DIALOG = "appsdialog";
     public static final String NEW_FOLDER = "asdfasdfasdf" ;

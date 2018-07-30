@@ -1,13 +1,16 @@
 package agrawal.bhanu.jetpack.launcher.data;
 
+import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -15,6 +18,7 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
+import android.view.Surface;
 import android.view.WindowManager;
 
 
@@ -244,6 +248,53 @@ public class AppsRepository {
         return (int)(width_px/itemWidth_px);
     }
 
+    public int getAppRowCountForHome(int orientation) {
+
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
+
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+
+        int height_px;
+        float pixeldpi = Resources.getSystem().getDisplayMetrics().density;
+        int itemHeight_dp = 95;
+
+        if(orientation == Configuration.ORIENTATION_PORTRAIT){
+            height_px = Resources.getSystem().getDisplayMetrics().widthPixels;
+        }
+        else{
+            height_px = Resources.getSystem().getDisplayMetrics().heightPixels;
+        }
+
+        float itemHeight_px = pixeldpi * itemHeight_dp;
+
+        return (int)(height_px/itemHeight_px);
+    }
+
+    public int getAppColumnCountForHome(int orientation) {
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+
+        int width_px;
+        float pixeldpi = Resources.getSystem().getDisplayMetrics().density;
+        int itemWidth_dp = 85;
+
+        if(orientation == Configuration.ORIENTATION_PORTRAIT){
+            width_px = Resources.getSystem().getDisplayMetrics().heightPixels;
+        }
+        else{
+            width_px = Resources.getSystem().getDisplayMetrics().widthPixels;
+        }
+        float itemWidth_px = pixeldpi * itemWidth_dp;
+        //return  1;
+        return (int)(width_px/itemWidth_px);
+    }
+
     public void saveAppsUsageInfo(ArrayList<AppDTO> apps) {
 
         ArrayList<AppDTO> appsInfo = new ArrayList<>();
@@ -315,12 +366,16 @@ public class AppsRepository {
 
             ArrayList<AppsAndFolder> foldersList = new ArrayList<>();
 
-            for(int i=0; i<getAppColumnCount()*(getAppRowCount()-2)-1; i++){
+            int orientation = application.getResources().getConfiguration().orientation;
+            int col_count = getAppColumnCountForHome(orientation);
+            int row_count = getAppRowCountForHome(orientation)-2;
+            for(int i=0; i<col_count*row_count-1; i++){
                 Folder f = new Folder("", "");
                 foldersList.add(f);
             }
 
             foldersList.add(frequestApps);
+            Collections.reverse(foldersList);
             saveFoldersInfo(foldersList);
             folders.postValue(foldersList);
         }
@@ -333,7 +388,7 @@ public class AppsRepository {
     }
 
     private ArrayList<AppsAndFolder> getFolderFromMemory() {
-        //return new ArrayList<>();
+//        return new ArrayList<>();
 
         RuntimeTypeAdapterFactory<AppsAndFolder> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(AppsAndFolder.class, "type")
