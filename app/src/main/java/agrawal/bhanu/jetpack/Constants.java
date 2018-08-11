@@ -8,4 +8,5 @@ public class Constants {
     public static final int DEFAULT_PAGE_POSITION = 1;
     public static String FOLDER = "folder";
     public static String APP_CONTAINER = "app";
+    public static String EMPTY = "empty";
 }

@@ -1,11 +1,16 @@
 package agrawal.bhanu.jetpack.launcher.ui.viewholder;
 
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
@@ -16,12 +21,17 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
+
+import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.AppsFolderAdapter;
-import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -47,6 +57,9 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     @BindView(R.id.infoUninstall)
     TextView infoUninstall;
 
+    @Inject
+    Executor executor;
+
     public AppViewHolder(View view, int viewType, Context context) {
         super(view);
         if(viewType != AppsAdapter.FOLDER){
@@ -61,6 +74,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         }
         this.context = context;
         mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
+        ((MyApp)((FragmentActivity) context).getApplication()).getLocalDataComponent().inject(this);
     }
 
     @Override
@@ -82,8 +96,10 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
                 context.startActivity(intent);
             }
         }catch(PackageManager.NameNotFoundException e){
+            e.printStackTrace();
         }
         catch(Exception e){
+            e.printStackTrace();
         }
 
     }
@@ -102,25 +118,38 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         ButterKnife.bind(this, customView);
         popupWindow = new PopupWindow(customView, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.showAsDropDown(appIconIV);
-        popupWindow.setOutsideTouchable(true);
         popupWindow.setFocusable(true);
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         if(getItemViewType() == AppsAdapter.ALL_APPS){
             addToHome.setVisibility(View.VISIBLE);
             addToHome.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     popupWindow.dismiss();
-                    mAppsModel.addToHome(app, new AddToHomeCallback() {
+                    mAppsModel.addToHome(app, new Callback() {
                         @Override
                         public void onSuccess() {
-                            ((FragmentActivity)context).onBackPressed();
+                            ((FragmentActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((FragmentActivity)context).onBackPressed();
+                                }
+                            });
+
                         }
 
                         @Override
-                        public void onError(String message) {
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                        public void onError(final String message) {
+                            ((FragmentActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     });
+
                 }
             });
         }

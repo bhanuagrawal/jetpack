@@ -11,16 +11,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -28,12 +32,13 @@ import javax.inject.Inject;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
-import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
+import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 /**
@@ -115,12 +120,11 @@ public class DefaultPage extends Fragment {
         appsFolderLayoutManager  =new GridLayoutManager(getActivity(), 1);
         appsFolderLayoutManager.setReverseLayout(true);
 //        appsFolderLayoutManager.setStackFromEnd(true);
-        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<Widget>());
+        appsFolderAdapter = new AppsFolderAdapter(getActivity(), new ArrayList<WidgetsMetaData>());
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {;
                 appsAdapter.setApps(appsInfo.getDefaultApps());
-                appsFolderAdapter.notifyDataSetChanged();
             }
         };
         mAppsModel.getAppsInfo().observe(this, appsObserver);
@@ -134,17 +138,24 @@ public class DefaultPage extends Fragment {
         });
 
         folderManager = new FolderManager(getContext());
-        mAppsModel.getFolders().observe(this, new Observer<ArrayList<Widget>>() {
+        mAppsModel.getWidgetsLiveMetadata().observe(getActivity(), new Observer<List<WidgetsMetaData>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<Widget> appsFolder) {
+            public void onChanged(@Nullable List<WidgetsMetaData> widgetsMetaData) {
+
+                if(widgetsMetaData.isEmpty()){
+                    mAppsModel.initializeHomePage();
+                }
                 appsFolderLayoutManager.setSpanCount(mAppsModel.getColumn_count());
-                appsFolderAdapter.setAppsFolder(appsFolder);
+                appsFolderAdapter.setAppsFolder((ArrayList<WidgetsMetaData>) widgetsMetaData);
             }
         });
 
         ItemTouchHelper.Callback _ithCallback = new ItemTouchHelper.Callback() {
 
-            //and in your imlpementaion of
+            int fromPosition;
+            int toPosition;
+            boolean itemMoved;
+            RecyclerView.ViewHolder best;
 
 
             @Override
@@ -153,11 +164,16 @@ public class DefaultPage extends Fragment {
             }
 
             @Override
+            public RecyclerView.ViewHolder chooseDropTarget(@NonNull RecyclerView.ViewHolder selected, @NonNull List<RecyclerView.ViewHolder> dropTargets, int curX, int curY) {
+                best = dropTargets.get(0);
+                return super.chooseDropTarget(selected, dropTargets, curX, curY);
+            }
+
+            @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
 
-                int fromPosition = viewHolder.getAdapterPosition();
-                int toPosition = target.getAdapterPosition();
-
+                fromPosition = viewHolder.getAdapterPosition();
+                toPosition = target.getAdapterPosition();
 
                 if(viewHolder.itemView.getVisibility() != View.VISIBLE){
                     return false;
@@ -167,27 +183,109 @@ public class DefaultPage extends Fragment {
 
                     // get the viewHolder's and target's positions in your adapter data, swap them
                 if(viewHolder instanceof AppViewHolder){
-/*                    if(((AppViewHolder)viewHolder).getContextMenu() != null){
-                    }*/
-
                     ((AppViewHolder)viewHolder).popupWindow.dismiss();
-
                 }
 
                 if (fromPosition < toPosition) {
                     for (int i = fromPosition; i < toPosition; i++) {
-                        Collections.swap(mAppsModel.getFolders().getValue(), i, i + 1);
+                       Collections.swap(mAppsModel.getWidgetsLiveMetadata().getValue(), i, i + 1);
                     }
                 } else {
                     for (int i = fromPosition; i > toPosition; i--) {
-                        Collections.swap(mAppsModel.getFolders().getValue(), i, i - 1);
+                        Collections.swap(mAppsModel.getWidgetsLiveMetadata().getValue(), i, i - 1);
                     }
                 }
+
                 appsFolderAdapter.notifyItemMoved(fromPosition, toPosition);
 
+                itemMoved = true;
                 // and notify the adapter that its dataset has changed
-                mAppsModel.onFoldersChange();
+                //mAppsModel.onWidgetPositionChange(fromPosition, toPosition);
                 return true;
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder viewHolder) {
+
+                if(viewHolder instanceof AppViewHolder){
+                    ((AppViewHolder)viewHolder).popupWindow.dismiss();
+                }
+
+                if(itemMoved){
+                    itemMoved = false;
+                    mAppsModel.onWidgetPositionChange(fromPosition, toPosition);
+                }
+
+                if(viewHolder instanceof AppViewHolder && best instanceof  AppViewHolder){
+
+                    mAppsModel.addFolderAtPos(best.getAdapterPosition(), new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            mAppsModel.addToFolder(best.getAdapterPosition(), mAppsModel.getWidgetsLiveMetadata().getValue().get(best.getAdapterPosition()).getAppId(), new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(final String message) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            });
+                            mAppsModel.addToFolder(best.getAdapterPosition(), mAppsModel.getWidgetsLiveMetadata().getValue().get(viewHolder.getAdapterPosition()).getAppId(), new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(final String message) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            });
+                            mAppsModel.removeFromHome(viewHolder.getAdapterPosition());
+                        }
+
+                        @Override
+                        public void onError(String message) {
+
+                        }
+                    });
+
+                }
+
+                if(viewHolder instanceof AppViewHolder && best instanceof AppsFolderAdapter.FolderViewHolder){
+
+                    mAppsModel.addToFolder(best.getAdapterPosition(), mAppsModel.getWidgetsLiveMetadata().getValue().get(viewHolder.getAdapterPosition()).getAppId(), new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            mAppsModel.removeFromHome(viewHolder.getAdapterPosition());
+                        }
+
+                        @Override
+                        public void onError(final String message) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                }
+                //Toast.makeText(getContext(), mAppsModel.getWidgetsLiveMetadata().getValue().get(best.getAdapterPosition()).getAppId(), Toast.LENGTH_LONG).show();
+
+                super.clearView(recyclerView, viewHolder);
             }
 
             @Override

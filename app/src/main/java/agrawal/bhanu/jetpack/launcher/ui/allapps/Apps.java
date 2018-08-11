@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.AppUtils;
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;

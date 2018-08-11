@@ -6,15 +6,13 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import java.util.ArrayList;
-
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 
 @Dao
 public interface FolderDao {
 
     @Query("SELECT * FROM Folder")
-    public LiveData<ArrayList<Folder>> getAll();
+    public Folder[] getAll();
 
     @Insert
     void insertAll(Folder... folders);
@@ -26,5 +24,8 @@ public interface FolderDao {
     void delete(Folder folder);
 
     @Query("SELECT * from Folder where folderId = :folderId")
-    Folder getFolderById(String folderId);
+    LiveData<Folder> getFolderById(String folderId);
+
+    @Query("DELETE from Folder")
+    void deleteAll();
 }

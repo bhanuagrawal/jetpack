@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 
+import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 
 public class AppUtils {

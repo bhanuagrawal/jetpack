@@ -11,11 +11,11 @@ public class FolderManager  {
         this.context = context;
     }
 
-    public AppsFolder newFolder(int folderContainer, String folderName, String folderId) {
+    public AppsFolder newFolder(int folderContainer, String folderId) {
 
 
 
-        AppsFolder appsFolderFragment = AppsFolder.newInstance(folderContainer, folderName, folderId);
+        AppsFolder appsFolderFragment = AppsFolder.newInstance(folderContainer, "", folderId);
         ((FragmentActivity)context).getSupportFragmentManager().
                 beginTransaction().
                 replace(folderContainer, appsFolderFragment, folderId).

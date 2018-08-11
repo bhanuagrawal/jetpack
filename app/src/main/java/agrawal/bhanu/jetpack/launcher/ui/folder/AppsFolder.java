@@ -19,10 +19,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MainActivity;
+import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
+import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
@@ -38,7 +44,7 @@ import butterknife.Unbinder;
  * Use the {@link AppsFolder#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppsFolder extends Fragment implements View.OnClickListener, LifecycleObserver {
+public class AppsFolder extends Fragment implements  LifecycleObserver {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -46,7 +52,6 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
     private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
-    private String folderName;
     private String folderId;
 
     private OnFragmentInteractionListener mListener;
@@ -63,6 +68,8 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
     @BindView(R.id.folderName)
     TextView folderNameTv;
 
+    @Inject
+    Executor executor;
 
     private Unbinder uibinder;
 
@@ -97,7 +104,6 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            folderName = getArguments().getString(ARG_PARAM1);
             folderId = getArguments().getString(ARG_PARAM2);
             container = getArguments().getInt(ARG_PARAM3);
         }
@@ -105,18 +111,37 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
-        mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
-            @Override
-            public void onChanged(@Nullable AppsInfo appsInfo) {
 
+        mAppsModel.getFolderById(folderId).observe(getActivity(), new Observer<Folder>() {
+            @Override
+            public void onChanged(@Nullable final Folder folder) {
+                folderNameTv.setText(folder.getFolderName());
+                folderLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folder.getFolderName());
+                        appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
+                    }
+                });
+
+
+            }
+        });
+
+
+        mAppsModel.getAppsByFolderId(folderId).observe(getActivity(), new Observer<List<App>>() {
+            @Override
+            public void onChanged(@Nullable List<App> apps) {
                 appRV.setLayoutFrozen(false);
                 layoutManager.setSpanCount(2);
                 appRV.setLayoutManager(layoutManager);
-                appAppsAdapter.setApps(mAppsModel.getAppsByFolderId(folderId));
+                appAppsAdapter.setApps((ArrayList<App>) apps);
                 appRV.setLayoutFrozen(true);
             }
         });
 
+
+        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
     }
 
     @Override
@@ -134,8 +159,6 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
         appRV.setLayoutManager(layoutManager);
         appRV.setAdapter(appAppsAdapter);
         appRV.setLayoutFrozen(true);
-        folderLayout.setOnClickListener(this);
-        folderNameTv.setText(folderName);
         return view;
     }
 
@@ -170,16 +193,6 @@ public class AppsFolder extends Fragment implements View.OnClickListener, Lifecy
     }
 
 
-    @Override
-    public void onClick(View view) {
-        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folderName);
-        appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
-    }
-
-    public void setName(String folderName) {
-        this.folderName = folderName;
-        folderNameTv.setText(folderName);
-    }
 
     /**
      * This interface must be implemented by activities that contain this

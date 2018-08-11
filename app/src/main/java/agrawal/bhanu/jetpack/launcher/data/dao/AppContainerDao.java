@@ -1,5 +1,6 @@
 package agrawal.bhanu.jetpack.launcher.data.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -7,7 +8,6 @@ import android.arch.persistence.room.Query;
 
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
-import agrawal.bhanu.jetpack.launcher.data.entities.FolderApps;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 
 @Dao
@@ -23,5 +23,7 @@ public interface AppContainerDao {
     void delete(Widget widget);
 
     @Query("SELECT * from AppContainer inner join App on AppContainer.appId = App.appPackage where containerId = :containerId")
-    App getAppBYContainerId(String containerId);
+    LiveData<App> getAppBYContainerId(String containerId);
+
+
 }

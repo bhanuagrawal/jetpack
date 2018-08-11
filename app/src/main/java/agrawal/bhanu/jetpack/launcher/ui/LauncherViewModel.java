@@ -2,16 +2,23 @@ package agrawal.bhanu.jetpack.launcher.ui;
 
 import android.app.Application;
 import android.app.WallpaperManager;
+import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -20,18 +27,17 @@ import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
-import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
-import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
+import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
-import agrawal.bhanu.jetpack.launcher.util.callbacks.AddToHomeCallback;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 
 public class LauncherViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
-    private MutableLiveData<ArrayList<Widget>> folders;
     private MutableLiveData<Drawable> wallpaper;
+    private LiveData<List<WidgetsMetaData>> widgetMetaData;
     private Application application;
     @Inject
     AppsRepository appsRepository;
@@ -50,18 +56,13 @@ public class LauncherViewModel extends AndroidViewModel {
         ((MyApp)application).getLocalDataComponent().inject(this);
     }
 
-    public MutableLiveData<ArrayList<Widget>> getFolders() {
-        if(folders == null){
-            folders = new MutableLiveData<ArrayList<Widget>>();
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    appsRepository.fetchFolders(folders);
-                }
-            });
+    public LiveData<List<WidgetsMetaData>> getWidgetsLiveMetadata() {
+        if(widgetMetaData == null){
+            widgetMetaData =  appsRepository.getWidgetLiveMetadata();
         }
-        return folders;
+        return widgetMetaData;
     }
+
 
 
     public MutableLiveData<AppsInfo> getAppsInfo() {
@@ -85,7 +86,12 @@ public class LauncherViewModel extends AndroidViewModel {
             mCurrentApps = new MutableLiveData<AppsInfo>();
             mCurrentApps.setValue(new AppsInfo(new ArrayList<App>(), new ArrayList<App>()));
         }
-        appsRepository.fetchApps(mCurrentApps);
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.fetchApps(mCurrentApps);
+            }
+        });
     }
 
     public int getAppsCountPerPage() {
@@ -114,93 +120,131 @@ public class LauncherViewModel extends AndroidViewModel {
         return wallpaper;
     }
 
-    public void onAppSelected(App app) {
+    public void onAppSelected(final App app) {
 
-        App afterChange = new App(app);
-        afterChange.setClicks(app.getClicks() + 1);
-        afterChange.setLastUsed(new Date());
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                App afterChange = new App(app);
+                afterChange.setClicks(app.getClicks() + 1);
+                afterChange.setLastUsed(new Date());
+                appsRepository.updateApp(afterChange);
+                appsRepository.addOrRemoveFromfrequentApps(afterChange);
+            }
+        });
 
-        appsRepository.updateApp(app, afterChange);
-        appsRepository.addOrRemoveFromfrequentApps(app);
     }
 
-    public void saveAppsUsageInfo() {
-        appsRepository.saveAppsUsageInfo(getAppsInfo().getValue().getApps());
 
-    }
-
-    public ArrayList<App> getAppsByFolderId(String folderId) {
-        return appsRepository.getAppsByFolderId(folderId);
+    public LiveData<List<App>> getAppsByFolderId(final String folderId) {
+        return Transformations.switchMap(mCurrentApps, new Function<AppsInfo, LiveData<List<App>>>() {
+            @Override
+            public LiveData<List<App>> apply(AppsInfo input) {
+                return appsRepository.getAppsByFolderId(folderId);
+            }
+        });
     }
 
     public void onFoldersChange() {
-        ArrayList<Widget> widgets = getFolders().getValue();
+/*        ArrayList<Widget> widgets = getWidgetsLiveMetadata().getValue();
         appsRepository.deleteAllWidgets();
-        appsRepository.saveFoldersInfo(widgets);
+        appsRepository.saveFoldersInfo(widgets, getWidgetsLiveMetadata());*/
     }
 
     public Drawable getAppIcon(String appPackage) {
         return appsRepository.getAppIcon(appPackage);
     }
 
-    public App getAppByContainer(String appContainerId) {
+    public LiveData<App> getAppByContainer(String appContainerId) {
         return appsRepository.getAppByContainerId(appContainerId);
     }
 
-    public void addToFolder(App app, String folderId) {
-        appsRepository.addToFolder(app, folderId, getAppsInfo());
-    }
-
-    public void addToHome(App app, AddToHomeCallback addToHomeCallback){
-
-
-        int position = getEmptyPositionOnDefaultPage();
-        if(position>=0 && position<getFolders().getValue().size()){
-
-            AppContainer appContainer = new AppContainer(String.valueOf(new Timestamp(new Date().getTime())), app.getAppPackage());
-            appsRepository.insertAppContainer(appContainer);
-            Widget widget = new Widget(appContainer, position);
-            appsRepository.updateWidgets(widget);
-            addToHomeCallback.onSuccess();
-        }
-        else {
-            addToHomeCallback.onError("No space left at Home");
-        }
-
-    }
-
-    public void addToHome(Folder folder, int position){
-    }
-
-    public int getEmptyPositionOnDefaultPage() {
-
-        for(Widget widget : getFolders().getValue()){
-
-            if(widget.getType().equals(Constants.APP_CONTAINER) &&
-                    appsRepository.getAppByContainerId(widget.getAppContainerId()) == null){
-
-                return getFolders().getValue().indexOf(widget);
-
+    public void addToFolder(final int position, final String appId, final Callback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.addToFolder(position, appId, callback);
             }
-            else if(widget.getType().equals(Constants.FOLDER)
-                    && widget.getRemovable() &&
-                    appsRepository.getAppsByFolderId(widget.getFolderId()).isEmpty()){
-                return getFolders().getValue().indexOf(widget);
+        });
+    }
+
+    public void addToHome(final App app, final Callback callback){
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                int position = getEmptyPositionOnHome();
+                if(position >=0){
+                    appsRepository.insertAppAtPosition(app, position);
+                    callback.onSuccess();
+                }
+                else {
+                    callback.onError("No space left at Home");
+                }
+            }
+        });
+
+    }
+
+    private int getEmptyPositionOnHome() {
+        List<WidgetsMetaData> widgetsMetaData = getWidgetsLiveMetadata().getValue();
+        for(WidgetsMetaData widget: widgetsMetaData){
+            if(widget.getType().equals(Constants.EMPTY) ||
+                    (widget.getType().equals(Constants.APP_CONTAINER) && widget.getAppId() == null) ||
+                    (widget.getType().equals(Constants.FOLDER) && widget.getAppsCount() == 0 && widget.isRemovable()) ){
+                return widget.getPosition();
             }
         }
 
         return -1;
     }
 
-    public void removeFromHome(int position) {
-        appsRepository.removeFromHome(position, getAppsInfo());
+    public void addToHome(Folder folder, int position){
+    }
+
+
+    public void removeFromHome(final int position) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.removeFromHome(position);
+            }
+        });
     }
 
     public int getAppsPerPage() {
         return appsRepository.getAppColumnCount()*appsRepository.getAppRowCount();
     }
 
-    public Folder getFolderById(String folderId) {
+    public LiveData<Folder> getFolderById(String folderId) {
         return appsRepository.getFolderById(folderId);
+    }
+
+    public void initializeHomePage() {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.initializeHomePage();
+            }
+        });
+    }
+
+    public void onWidgetPositionChange(final int fromPosition, final int toPosition) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.onWidgetPositionChange(getWidgetsLiveMetadata().getValue());
+            }
+        });
+    }
+
+    public void addFolderAtPos(final int position, final Callback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.addFolderAtPos(position, callback);
+
+            }
+        });
     }
 }

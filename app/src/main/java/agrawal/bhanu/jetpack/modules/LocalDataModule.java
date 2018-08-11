@@ -23,6 +23,8 @@ public class LocalDataModule {
     }
 
 
+    @Provides
+    @Singleton
     LauncherDatabase providesLauncherDatabase(Application application){
         LauncherDatabase db = Room.databaseBuilder(application,
                 LauncherDatabase.class, "launcher-data").build();

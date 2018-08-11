@@ -6,6 +6,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ public class App {
 
     @PrimaryKey
     @ColumnInfo(name = "appPackage")
+    @NonNull
     private String appPackage;
 
     @ColumnInfo(name = "appName")
@@ -24,7 +26,7 @@ public class App {
     private Date lastUsed;
 
     @ColumnInfo(name = "clioks")
-    private int clicks;
+    private int clicks = 0;
 
     @ColumnInfo(name = "isDefault")
     private boolean isDefault;
@@ -41,6 +43,8 @@ public class App {
         this.icon = app.icon;
     }
 
+
+    public App(){}
     public Drawable getIcon() {
         return icon;
     }

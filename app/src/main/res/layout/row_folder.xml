@@ -8,6 +8,7 @@
 
     <FrameLayout
         android:id="@+id/folderContainer"
+        android:longClickable="true"
         android:clickable="true"
         android:layout_width="85dp"
         android:layout_height="95dp" />

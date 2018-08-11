@@ -1,6 +1,7 @@
 package agrawal.bhanu.jetpack.launcher.data;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
@@ -9,19 +10,21 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 
 import com.google.gson.Gson;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -36,8 +39,10 @@ import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderApps;
+import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
+import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 
 
 public class AppsRepository {
@@ -69,6 +74,9 @@ public class AppsRepository {
             if(appUsage != null){
                 appDTO.setClicks(appUsage.getClicks());
                 appDTO.setLastUsed(appUsage.getLastUsed());
+            }
+            else {
+                database.appsDao().insertAll(appDTO);
             }
 
             addOrRemoveFromfrequentApps(appDTO);
@@ -110,14 +118,22 @@ public class AppsRepository {
             appsInfo.getDefaultApps().add(appsInfo.getInternetApp());
         }
 
-        saveAppsUsageInfo(apps);
+
+        String[] appPackages = new String[apps.size()];
+        int i=0;
+        for(App app: apps){
+            appPackages[i] = app.getAppPackage();
+            i++;
+        }
+
+        database.appsDao().deleteUninstalled(appPackages);
         mCurrentApps.postValue(appsInfo);
 
     }
 
 
     private ArrayList<agrawal.bhanu.jetpack.launcher.data.entities.App> getAppUsageInfo() {
-        return database.appsDao().getAll();
+        return new ArrayList<>(Arrays.asList(database.appsDao().getAll()));
     }
 
     private App getDefaultCallApp(Intent intent) {
@@ -221,7 +237,7 @@ public class AppsRepository {
         int itemHeight_dp = 95;
         float itemHeight_px = pixeldpi * itemHeight_dp;
 
-        return (int)(height_px/itemHeight_px);
+        return (int)(height_px/itemHeight_px)-1;
     }
 
     public int getAppColumnCount() {
@@ -286,18 +302,6 @@ public class AppsRepository {
         return (int)(width_px/itemWidth_px);
     }
 
-    public void saveAppsUsageInfo(ArrayList<App> apps) {
-        database.appsDao().insertAll(apps.toArray(new App[apps.size()]));
-    }
-
-    public App getAppFromPackage(ArrayList<App> apps, String appPackage) {
-        for(App app : apps){
-            if(app.getAppPackage().equals(appPackage)){
-                return app;
-            }
-        }
-        return null;
-    }
 
 
     public void addOrRemoveFromfrequentApps(App app) {
@@ -305,7 +309,13 @@ public class AppsRepository {
         if(app.getLastUsed() != null){
             long diffHours = (new Date().getTime() - app.getLastUsed().getTime())/ (60 * 60 * 1000);
             if(diffHours <= 24){
-                database.folderAppsDao().insert(new FolderApps(MainActivity.FREQUENT_APPS, app.getAppPackage()));
+
+                try {
+                    database.folderAppsDao().insert(new FolderApps(MainActivity.FREQUENT_APPS, app.getAppPackage()));
+                }
+                catch (SQLiteConstraintException e){
+                    Log.d("insert error", "already present");
+                }
             }
             else{
                 database.folderAppsDao().delete(app.getAppPackage());
@@ -313,99 +323,98 @@ public class AppsRepository {
         }
     }
 
-    public ArrayList<App> getAppsByFolderId(String folderId) {
+    public LiveData<List<App>> getAppsByFolderId(String folderId) {
 
-        ArrayList<App> suggestion = database.folderAppsDao().getAppsByFolderId(folderId);
+        LiveData<List<App>> apps = database.folderAppsDao().getAppsByFolderId(folderId);
+        return apps;
+    }
 
-        if(folderId.equals(MainActivity.FREQUENT_APPS)){
-            Collections.sort(suggestion, new Comparator<App>() {
-                @Override
-                public int compare(App app, App t1) {
-                    return t1.getClicks()- app.getClicks();
-                }
-            });
+
+
+    public void saveFoldersInfo(ArrayList<Widget> widgets, MutableLiveData<ArrayList<Widget>> widgetList) {
+        for(Widget widget: widgets){
+            Log.d("position", String.valueOf(widget.getPosition()));
         }
-
-        return suggestion;
+        database.widgetsDao().insertAll(widgets.toArray(new Widget[widgets.size()]));
+        widgetList.postValue(widgets);
     }
 
-    public void fetchFolders(MutableLiveData<ArrayList<Widget>> widgetList) {
-
-        ArrayList<Widget> prevWidgets = getFolderFromMemory();
-
-        if(prevWidgets.isEmpty()){
-            Folder frequestApps = new Folder("Frequent Apps", MainActivity.FREQUENT_APPS);
-
-            ArrayList<Folder> foldersList = new ArrayList<>();
-            ArrayList<Widget> widgets = new ArrayList<>();
-
-            int orientation = application.getResources().getConfiguration().orientation;
-            int col_count = getAppColumnCountForHome(orientation);
-            int row_count = getAppRowCountForHome(orientation)-2;
-            for(int i=0; i<col_count*row_count; i++){
-                Folder f = new Folder(String.valueOf(new Timestamp(new Date().getTime())), "");
-                widgets.add(new Widget("", f.getFolderId(), Constants.FOLDER, true, i));
-                foldersList.add(f);
-            }
-            foldersList.set(0, frequestApps);
-            widgets.set(0, new Widget("", frequestApps.getFolderId(), frequestApps.getFolderName(), false, 0));
-            database.folderDao().insertAll(foldersList.toArray(new Folder[foldersList.size()]));
-            database.widgetsDao().insertAll(widgets.toArray(new Widget[widgets.size()]));
-            saveFoldersInfo(widgets);
-            widgetList.postValue(widgets);
-        }
-        else {
-            widgetList.postValue(prevWidgets);
-        }
-
-    }
-
-    private ArrayList<Widget> getFolderFromMemory() {
-        ArrayList<Widget> widgets = database.widgetsDao().getAll();
-        Collections.sort(widgets, new Comparator<Widget>() {
-            @Override
-            public int compare(Widget widget, Widget t1) {
-                return widget.getPosition() - t1.getPosition();
-            }
-        });
-        return widgets;
-    }
-
-    public void saveFoldersInfo(ArrayList<Widget> widgets) {
-        database.widgetsDao().insertAll(widgets.toArray(new agrawal.bhanu.jetpack.launcher.data.entities.Widget[widgets.size()]));
-    }
-
-    public App getAppByContainerId(String appContainerId) {
-
+    public LiveData<App> getAppByContainerId(String appContainerId) {
         return database.appContainerDao().getAppBYContainerId(appContainerId);
     }
 
-    public void addToFolder(App app, String folderId, MutableLiveData<AppsInfo> appsInfo) {
-        sadvsc
+    public void addToFolder(int position, String appId, Callback callback) {
+        database.folderAppsDao().addToFolder(position, appId, callback);
     }
 
-    public Folder getFolderById(String folderId) {
+    public LiveData<Folder> getFolderById(String folderId) {
+
         return database.folderDao().getFolderById(folderId);
     }
 
-    public void removeFromHome(int position, MutableLiveData<AppsInfo> appsInfo) {
-        sasDAVSFX
+    public void removeFromHome(int position, MutableLiveData<ArrayList<Widget>> widgets) {
+/*        database.widgetsDao().delete(position);
+        Widget widget = new Widget(new Folder(UUID.randomUUID().toString(), "New Folder"), position);
+        database.widgetsDao().insertAll(widget);
+
+        widgets.postValue(getFolderFromMemory());*/
     }
 
-    public void updateApp(App app, App afterChange) {
-
+    public void updateApp(App afterChange) {
+        database.appsDao().update(afterChange);
     }
 
     public void insertAppContainer(AppContainer appContainer) {
         database.appContainerDao().insert(appContainer);
     }
 
-    public void updateWidgets(Widget widget) {
-        sdfv
+    public void updateWidgets(MutableLiveData<ArrayList<Widget>> widgets, Widget widget, int position) {
+/*        database.widgetsDao().delete(position);
+        database.widgetsDao().insertAll(widget);
+        widgets.postValue(getFolderFromMemory());*/
     }
 
     public void deleteAllWidgets() {
         database.widgetsDao().deleteAll();
-        jkm;l
+    }
+
+
+    public LiveData<List<WidgetsMetaData>> getWidgetLiveMetadata() {
+
+        return  database.HomePageMetadataDao().getWidgetsLiveMetaData();
+    }
+
+    public void initializeHomePage() {
+        int orientation = application.getResources().getConfiguration().orientation;
+        int col_count = getAppColumnCountForHome(orientation);
+        int row_count = getAppRowCountForHome(orientation)-2;
+        for(int i=0; i<col_count*row_count; i++){
+
+            if(i == 0){
+                database.HomePageMetadataDao().createFolderWidget(i, Constants.FOLDER, false, MainActivity.FREQUENT_APPS, "Frequent Apps");
+            }
+            else{
+
+                database.HomePageMetadataDao().createEmptyWidget(i, Constants.EMPTY);
+
+            }
+
+        }
+    }
+
+    public void insertAppAtPosition(App app, int position) {
+        database.HomePageMetadataDao().insertAppAtPosition(app, position);
+    }
+
+    public void removeFromHome(int position) {
+        database.HomePageMetadataDao().removeFromHome(position);
+    }
+
+    public void onWidgetPositionChange(List<WidgetsMetaData> value) {
+        database.HomePageMetadataDao().onWidgetPositionChange(value);
+    }
+
+    public void addFolderAtPos(int position, Callback callback) {
+        database.HomePageMetadataDao().addFolderAtPos(position, callback);
     }
 }

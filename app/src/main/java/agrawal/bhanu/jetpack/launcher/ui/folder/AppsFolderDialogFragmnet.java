@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
@@ -93,10 +94,10 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER_DIALOG);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
 
-        mAppsModel.getAppsInfo().observe(this, new Observer<AppsInfo>() {
+        mAppsModel.getAppsByFolderId(folderId).observe(getActivity(), new Observer<List<App>>() {
             @Override
-            public void onChanged(@Nullable AppsInfo appsInfo) {
-                appAppsAdapter.setApps(mAppsModel.getAppsByFolderId(folderId));
+            public void onChanged(@Nullable List<App> apps) {
+                appAppsAdapter.setApps((ArrayList<App>) apps);
             }
         });
     }

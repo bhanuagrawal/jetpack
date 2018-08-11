@@ -84,7 +84,7 @@ public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     @Override
     public void onBindViewHolder(AppViewHolder holder, final int position) {
         holder.appNameTV.setText(apps.get(position).getAppName());
-        holder.appIconIV.setImageDrawable(apps.get(position).getIcon());
+        holder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(apps.get(position).getAppPackage()));
         holder.setApp(apps.get(position));
     }
 
