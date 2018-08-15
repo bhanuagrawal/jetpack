@@ -247,4 +247,8 @@ public class LauncherViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public String getJSonString(Class widgetMetadataClass, Object object) {
+        return appsRepository.getJSonString(widgetMetadataClass, object);
+    }
 }

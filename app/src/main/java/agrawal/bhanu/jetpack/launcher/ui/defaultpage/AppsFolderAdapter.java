@@ -38,6 +38,7 @@ import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
+import agrawal.bhanu.jetpack.launcher.data.entities.WidgetMetadata;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
@@ -62,11 +63,32 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void setAppsFolder(ArrayList<WidgetsMetaData> widgetsMetaData) {
 
-
-
+        ArrayList<WidgetsMetaData> oldData = this.widgetsMetaData;
         this.widgetsMetaData = widgetsMetaData;
-        notifyDataSetChanged();
+        notifyDataChanged(oldData, widgetsMetaData);
     }
+
+    private void notifyDataChanged(ArrayList<WidgetsMetaData> oldData, ArrayList<WidgetsMetaData> newData) {
+
+
+        if(oldData.size() != newData.size()){
+            notifyDataSetChanged();
+        }
+        else{
+            for(int i=0; i<oldData.size(); i++){
+
+                String a = mAppsModel.getJSonString(WidgetMetadata.class, oldData.get(i));
+                String b = mAppsModel.getJSonString(WidgetMetadata.class, newData.get(i));
+
+                if(!a.equals(b)){
+                    notifyItemChanged(i);
+                }
+            }
+        }
+
+    }
+
+
 
     public AppsFolderAdapter(Context context, ArrayList<WidgetsMetaData> widgetsMetaData) {
         this.context = context;

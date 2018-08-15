@@ -417,4 +417,10 @@ public class AppsRepository {
     public void addFolderAtPos(int position, Callback callback) {
         database.HomePageMetadataDao().addFolderAtPos(position, callback);
     }
+
+    public String getJSonString(Class c, Object object) {
+
+        String a = gson.toJson(object);
+        return a;
+    }
 }

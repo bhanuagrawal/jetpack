@@ -88,4 +88,9 @@ public class WidgetsMetaData {
     public void setAppsCount(int appCount) {
         this.appsCount = appCount;
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
