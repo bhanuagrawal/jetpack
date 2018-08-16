@@ -4,10 +4,13 @@ import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,6 +33,7 @@ import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
+import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
@@ -44,7 +49,7 @@ import butterknife.Unbinder;
  * Use the {@link AppsFolder#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppsFolder extends Fragment implements  LifecycleObserver {
+public class AppsFolder extends Fragment implements  LifecycleObserver{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -71,11 +76,14 @@ public class AppsFolder extends Fragment implements  LifecycleObserver {
     @Inject
     Executor executor;
 
+    public FolderWidget folderWidget;
+
     private Unbinder uibinder;
 
 
     private int container;
     private LauncherViewModel mAppsModel;
+    private PopupWindow popupWindow;
 
     public AppsFolder() {
         // Required empty public constructor
@@ -112,18 +120,44 @@ public class AppsFolder extends Fragment implements  LifecycleObserver {
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
 
-        mAppsModel.getFolderById(folderId).observe(getActivity(), new Observer<Folder>() {
-            @Override
-            public void onChanged(@Nullable final Folder folder) {
-                folderNameTv.setText(folder.getFolderName());
-                folderLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folder.getFolderName());
-                        appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
-                    }
-                });
+        mAppsModel.getFolderById(folderId).observe(getActivity(), new Observer<FolderWidget>() {
 
+            @Override
+            public void onChanged(@Nullable final FolderWidget folderWidget) {
+                if(folderWidget!=null){
+                    folderNameTv.setText(folderWidget.getFolder().getFolderName());
+                    if(folderWidget.getWidget().getRemovable()){
+                        folderLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View view) {
+                                LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                View customView = layoutInflater.inflate(R.layout.popup_window,null);
+                                TextView remove = (TextView)customView.findViewById(R.id.remove);
+                                popupWindow = new PopupWindow(customView, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                                popupWindow.showAsDropDown(view);
+                                popupWindow.setFocusable(true);
+                                popupWindow.update();
+                                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                remove.setVisibility(View.VISIBLE);
+                                remove.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        popupWindow.dismiss();
+                                        mAppsModel.removeFromHome(folderId);
+                                    }
+                                });
+                                return false;
+                            }
+                        });
+                    }
+                    folderLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folderWidget.getFolder().getFolderName());
+                            appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
+                        }
+                    });
+                }
 
             }
         });
@@ -191,7 +225,6 @@ public class AppsFolder extends Fragment implements  LifecycleObserver {
         super.onDestroyView();
         uibinder.unbind();
     }
-
 
 
     /**

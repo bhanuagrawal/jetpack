@@ -28,6 +28,7 @@ import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.launcher.data.AppsRepository;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
+import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
@@ -216,7 +217,7 @@ public class LauncherViewModel extends AndroidViewModel {
         return appsRepository.getAppColumnCount()*appsRepository.getAppRowCount();
     }
 
-    public LiveData<Folder> getFolderById(String folderId) {
+    public LiveData<FolderWidget> getFolderById(String folderId) {
         return appsRepository.getFolderById(folderId);
     }
 
@@ -250,5 +251,14 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public String getJSonString(Class widgetMetadataClass, Object object) {
         return appsRepository.getJSonString(widgetMetadataClass, object);
+    }
+
+    public void removeFromHome(final String folderId) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                appsRepository.removeFromHome(folderId);
+            }
+        });
     }
 }

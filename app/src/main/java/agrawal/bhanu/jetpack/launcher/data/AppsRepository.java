@@ -39,6 +39,7 @@ import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderApps;
+import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
@@ -347,7 +348,7 @@ public class AppsRepository {
         database.folderAppsDao().addToFolder(position, appId, callback);
     }
 
-    public LiveData<Folder> getFolderById(String folderId) {
+    public LiveData<FolderWidget> getFolderById(String folderId) {
 
         return database.folderDao().getFolderById(folderId);
     }
@@ -422,5 +423,9 @@ public class AppsRepository {
 
         String a = gson.toJson(object);
         return a;
+    }
+
+    public void removeFromHome(String folderId) {
+        database.HomePageMetadataDao().removeFromHome(folderId);
     }
 }

@@ -48,11 +48,17 @@ public abstract class HomePageMetadataDao {
     @Query("SELECT * from Widget where position = :posiition")
     abstract Widget getWidgetAtPosition(int posiition);
 
+    @Query("select widget.* from folder left join widget on folder.widgetId = widget.widgetId where folderId = :folderId")
+    protected abstract Widget getWidgetByFolderId(String folderId);
+
     @Update
     abstract void updateWidget(Widget widget);
 
     @Delete
     abstract void deleteWidget(Widget widget);
+
+    @Query("delete from Widget where widgetId in (select widgetId from folder where folderId=:folderId)")
+    abstract void deleteWidget(String folderId);
 
     @Query("Select Folder.*  from folder left join widget on folder.widgetId = widget.widgetId where position = :position")
     abstract Folder getFolderAtPos(int position);
@@ -86,6 +92,18 @@ public abstract class HomePageMetadataDao {
         insertWidget(widget);
     }
 
+
+    @Transaction
+    public void removeFromHome(String folderId) {
+
+        Widget widget = getWidgetByFolderId(folderId);
+        deleteWidget(widget);
+        widget.setType(Constants.EMPTY);
+        widget.setRemovable(false);
+        insertWidget(widget);
+    }
+
+
     @Transaction
     public void onWidgetPositionChange(int fromPosition, int toPosition) {
         Widget w1 = getWidgetAtPosition(fromPosition);
@@ -118,4 +136,5 @@ public abstract class HomePageMetadataDao {
         insertFolder(new Folder(UUID.randomUUID().toString(), "New Folder", insertWidget(new Widget(position, Constants.FOLDER, true))));
         callback.onSuccess();
     }
+
 }

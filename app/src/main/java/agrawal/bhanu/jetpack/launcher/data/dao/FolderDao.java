@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
 import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
+import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
 
 @Dao
 public interface FolderDao {
@@ -23,8 +24,9 @@ public interface FolderDao {
     @Delete
     void delete(Folder folder);
 
-    @Query("SELECT * from Folder where folderId = :folderId")
-    LiveData<Folder> getFolderById(String folderId);
+
+    @Query("SELECT folder.widgetId, folder.folderId, folder.folderName, widget.widgetId as type_widgetId, position as type_position, removable as type_removable, type as type_type from Folder left join widget on folder.widgetId = widget.widgetId where folderId = :folderId")
+    LiveData<FolderWidget> getFolderById(String folderId);
 
     @Query("DELETE from Folder")
     void deleteAll();
