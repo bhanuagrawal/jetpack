@@ -1,7 +1,7 @@
 package agrawal.bhanu.jetpack.reddit.model;
 
-import android.support.annotation.NonNull;
-import android.support.v7.recyclerview.extensions.DiffCallback;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 
 import java.io.Serializable;
 
@@ -36,7 +36,7 @@ public class Post implements Serializable {
         return "ClassPojo [data = "+data+", kind = "+kind+"]";
     }
 
-    public static DiffCallback<Post> DIFF_CALLBACK = new DiffCallback<Post>() {
+    public static DiffUtil.ItemCallback<Post> DIFF_CALLBACK = new DiffUtil.ItemCallback<Post>() {
         @Override
         public boolean areItemsTheSame(@NonNull Post oldItem, @NonNull Post newItem) {
             return oldItem.getData().getId() == newItem.getData().getId();
@@ -44,7 +44,7 @@ public class Post implements Serializable {
 
         @Override
         public boolean areContentsTheSame(@NonNull Post oldItem, @NonNull Post newItem) {
-            return oldItem.equals(newItem);
+            return oldItem == newItem;
         }
     };
 }

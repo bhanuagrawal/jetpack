@@ -1,7 +1,7 @@
 package agrawal.bhanu.jetpack.launcher.data.entities;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 
 
 public class WidgetsMetaData {

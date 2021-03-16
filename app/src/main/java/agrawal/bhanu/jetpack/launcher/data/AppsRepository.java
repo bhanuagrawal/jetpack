@@ -1,8 +1,8 @@
 package agrawal.bhanu.jetpack.launcher.data;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,7 +37,6 @@ import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
-import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderApps;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;

@@ -1,13 +1,13 @@
 package agrawal.bhanu.jetpack.reddit.ui;
 
 import android.app.Application;
-import android.arch.core.util.Function;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.PagedList;
-import android.support.annotation.NonNull;
+import androidx.arch.core.util.Function;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
+import androidx.annotation.NonNull;
 
 import java.util.concurrent.Executor;
 
@@ -44,7 +44,6 @@ public class RedditPostViewModel extends AndroidViewModel {
                             .setPageSize(20).build();
 
             postList = (new LivePagedListBuilder(postDataSourceFactory, pagedListConfig))
-                    .setBackgroundThreadExecutor(executor)
                     .build();
         }
         return postList;

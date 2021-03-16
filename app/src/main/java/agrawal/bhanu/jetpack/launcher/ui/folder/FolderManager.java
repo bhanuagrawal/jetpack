@@ -1,7 +1,7 @@
 package agrawal.bhanu.jetpack.launcher.ui.folder;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class FolderManager  {
 
@@ -16,7 +16,7 @@ public class FolderManager  {
 
 
         AppsFolder appsFolderFragment = AppsFolder.newInstance(folderContainer, "", folderId);
-        ((FragmentActivity)context).getSupportFragmentManager().
+        ((AppCompatActivity)context).getSupportFragmentManager().
                 beginTransaction().
                 replace(folderContainer, appsFolderFragment, folderId).
                 commit();

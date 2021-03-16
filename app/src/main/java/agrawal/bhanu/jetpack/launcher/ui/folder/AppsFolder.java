@@ -1,20 +1,20 @@
 package agrawal.bhanu.jetpack.launcher.ui.folder;
 
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +32,7 @@ import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
-import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderWidget;
-import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import butterknife.BindView;
@@ -154,7 +152,7 @@ public class AppsFolder extends Fragment implements  LifecycleObserver{
                         @Override
                         public void onClick(View view) {
                             appsDialog = AppsFolderDialogFragmnet.newInstance(folderId, folderWidget.getFolder().getFolderName());
-                            appsDialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
+                            appsDialog.show(((AppCompatActivity)getContext()).getSupportFragmentManager(), MainActivity.APPS_DIALOG);
                         }
                     });
                 }

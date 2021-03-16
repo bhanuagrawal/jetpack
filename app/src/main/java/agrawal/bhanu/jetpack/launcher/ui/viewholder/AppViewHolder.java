@@ -1,19 +1,16 @@
 package agrawal.bhanu.jetpack.launcher.ui.viewholder;
 
 import android.app.Activity;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -73,8 +70,8 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
             parentLayout.setOnClickListener(this);
         }
         this.context = context;
-        mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
-        ((MyApp)((FragmentActivity) context).getApplication()).getLocalDataComponent().inject(this);
+        mAppsModel = ViewModelProviders.of((AppCompatActivity)context).get(LauncherViewModel.class);
+        ((MyApp)((AppCompatActivity) context).getApplication()).getLocalDataComponent().inject(this);
     }
 
     @Override
@@ -130,10 +127,10 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
                     mAppsModel.addToHome(app, new Callback() {
                         @Override
                         public void onSuccess() {
-                            ((FragmentActivity)context).runOnUiThread(new Runnable() {
+                            ((AppCompatActivity)context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    ((FragmentActivity)context).onBackPressed();
+                                    ((AppCompatActivity)context).onBackPressed();
                                 }
                             });
 
@@ -141,7 +138,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
 
                         @Override
                         public void onError(final String message) {
-                            ((FragmentActivity)context).runOnUiThread(new Runnable() {
+                            ((AppCompatActivity)context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(context, message, Toast.LENGTH_LONG).show();

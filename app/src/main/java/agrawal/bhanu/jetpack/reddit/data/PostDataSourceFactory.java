@@ -1,7 +1,8 @@
 package agrawal.bhanu.jetpack.reddit.data;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
 
 import java.util.concurrent.Executor;
 
@@ -10,7 +11,7 @@ import javax.inject.Inject;
 import agrawal.bhanu.jetpack.MyApp;
 
 
-public class PostDataSourceFactory implements android.arch.paging.DataSource.Factory {
+public class PostDataSourceFactory extends DataSource.Factory {
 
     @Inject
     ItemKeyedPostDataSource itemKeyedPostDataSource;
@@ -31,7 +32,7 @@ public class PostDataSourceFactory implements android.arch.paging.DataSource.Fac
     }
 
     @Override
-    public android.arch.paging.DataSource create() {
+    public androidx.paging.DataSource create() {
         ((MyApp)application).getWebComponent().inject(this);
         mutableLiveData.postValue(itemKeyedPostDataSource);
         return itemKeyedPostDataSource;

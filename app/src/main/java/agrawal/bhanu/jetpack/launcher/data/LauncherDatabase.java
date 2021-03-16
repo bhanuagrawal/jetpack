@@ -1,8 +1,8 @@
 package agrawal.bhanu.jetpack.launcher.data;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import agrawal.bhanu.jetpack.launcher.data.dao.AppContainerDao;
 import agrawal.bhanu.jetpack.launcher.data.dao.AppsDao;
@@ -17,7 +17,6 @@ import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
 import agrawal.bhanu.jetpack.launcher.data.entities.FolderApps;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetPositon;
-import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.data.util.Converters;
 
 @Database(entities = {App.class,

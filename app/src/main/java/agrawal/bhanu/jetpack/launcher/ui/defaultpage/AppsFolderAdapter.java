@@ -1,50 +1,35 @@
 package agrawal.bhanu.jetpack.launcher.ui.defaultpage;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.Constants;
-import agrawal.bhanu.jetpack.MainActivity;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
-import agrawal.bhanu.jetpack.launcher.data.entities.AppContainer;
-import agrawal.bhanu.jetpack.launcher.data.entities.Folder;
-import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetMetadata;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
-import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
-import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -93,9 +78,9 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public AppsFolderAdapter(Context context, ArrayList<WidgetsMetaData> widgetsMetaData) {
         this.context = context;
         this.widgetsMetaData = widgetsMetaData;
-        mAppsModel = ViewModelProviders.of((FragmentActivity)context).get(LauncherViewModel.class);
+        mAppsModel = ViewModelProviders.of((AppCompatActivity)context).get(LauncherViewModel.class);
         folderMananger = new FolderManager(context);
-        ((MyApp)((FragmentActivity) context).getApplication()).getLocalDataComponent().inject(this);
+        ((MyApp)((AppCompatActivity) context).getApplication()).getLocalDataComponent().inject(this);
     }
 
 
@@ -203,7 +188,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             final AppViewHolder viewHolder = (AppViewHolder)holder;
 
-            mAppsModel.getAppByContainer(widgetsMetaData.get(position).getAppContainerId()).observe((FragmentActivity) context, new android.arch.lifecycle.Observer<App>() {
+            mAppsModel.getAppByContainer(widgetsMetaData.get(position).getAppContainerId()).observe((AppCompatActivity) context, new androidx.lifecycle.Observer<App>() {
                 @Override
                 public void onChanged(@Nullable App app) {
                     viewHolder.itemView.setVisibility(app == null?View.GONE:View.VISIBLE);

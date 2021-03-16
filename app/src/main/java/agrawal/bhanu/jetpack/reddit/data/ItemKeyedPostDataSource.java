@@ -1,8 +1,8 @@
 package agrawal.bhanu.jetpack.reddit.data;
 import android.app.Application;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.ItemKeyedDataSource;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.ItemKeyedDataSource;
+import androidx.annotation.NonNull;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;

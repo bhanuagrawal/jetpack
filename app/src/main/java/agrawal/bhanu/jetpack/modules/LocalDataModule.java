@@ -2,7 +2,7 @@ package agrawal.bhanu.jetpack.modules;
 
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 
 import javax.inject.Singleton;
 
