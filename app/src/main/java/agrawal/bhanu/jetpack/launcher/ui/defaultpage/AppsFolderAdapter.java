@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -24,14 +25,14 @@ import javax.inject.Inject;
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.RowAppContainerBinding;
+import agrawal.bhanu.jetpack.databinding.RowFolderBinding;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetMetadata;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -80,22 +81,20 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.widgetsMetaData = widgetsMetaData;
         mAppsModel = ViewModelProviders.of((AppCompatActivity)context).get(LauncherViewModel.class);
         folderMananger = new FolderManager(context);
-        ((MyApp)((AppCompatActivity) context).getApplication()).getLocalDataComponent().inject(this);
     }
 
 
 
     public class FolderViewHolder extends RecyclerView.ViewHolder implements  View.OnLongClickListener {
 
-        @BindView(R.id.folderContainer)
-        FrameLayout frameLayout;
 
+        private final RowFolderBinding binding;
         private PopupWindow popupWindow;
 
-        public FolderViewHolder(View view) {
-            super(view);
-            ButterKnife.bind(this, view);
-            view.setOnLongClickListener(this);
+        public FolderViewHolder(RowFolderBinding  binding ){
+            super(binding.getRoot());
+            this.binding = binding;
+            itemView.setOnLongClickListener(this);
         }
 
         public void bindTo(final WidgetsMetaData widgetsMetaData) {
@@ -103,8 +102,8 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             itemView.setVisibility(widgetsMetaData.getAppsCount() == 0?View.INVISIBLE:View.VISIBLE);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 int newContainerId = View.generateViewId();
-                frameLayout.setId(newContainerId);
-                folderMananger.newFolder(frameLayout.getId(), widgetsMetaData.getFolderId());
+                binding.folderContainer.setId(newContainerId);
+                folderMananger.newFolder(binding.folderContainer.getId(), widgetsMetaData.getFolderId());
             }
         }
 
@@ -157,22 +156,17 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View itemView;
 
         switch (viewType){
 
             case APP_CONTAINER:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app_container, parent, false);
-                return new AppViewHolder(itemView, viewType, context);
+                return new AppViewHolder(RowAppContainerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
             case FOLDER:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_folder, parent, false);
-                return new FolderViewHolder(itemView);
+                return new FolderViewHolder(RowFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+
             default:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_folder, parent, false);
-                return new FolderViewHolder(itemView);
+                return new AppViewHolder(RowAppContainerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
+
 
         }
 
@@ -193,8 +187,8 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 public void onChanged(@Nullable App app) {
                     viewHolder.itemView.setVisibility(app == null?View.GONE:View.VISIBLE);
                     if(app != null){
-                        viewHolder.appNameTV.setText(app.getAppName());
-                        viewHolder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(app.getAppPackage()));
+                        ((TextView)viewHolder.itemView.findViewById(R.id.app_name)).setText(app.getAppName());
+                        ((ImageView)viewHolder.itemView.findViewById(R.id.app_icon)).setImageDrawable(mAppsModel.getAppIcon(app.getAppPackage()));
                         viewHolder.setApp(app);
                     }
                 }

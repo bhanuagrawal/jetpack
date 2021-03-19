@@ -29,7 +29,9 @@ import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
+import dagger.hilt.android.lifecycle.HiltViewModel;
 
+@HiltViewModel
 public class LauncherViewModel extends AndroidViewModel {
 
     private MutableLiveData<AppsInfo> mCurrentApps;
@@ -47,10 +49,10 @@ public class LauncherViewModel extends AndroidViewModel {
     WallpaperManager wallpaperManager;
 
 
+    @Inject
     public LauncherViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
-        ((MyApp)application).getLocalDataComponent().inject(this);
     }
 
     public LiveData<List<WidgetsMetaData>> getWidgetsLiveMetadata() {

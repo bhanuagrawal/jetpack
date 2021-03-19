@@ -26,7 +26,9 @@ import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolderDialogFragmnet;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.launcher.ui.Home;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity
 implements ItemsList.OnFragmentInteractionListener,
         AppList.OnFragmentInteractionListener,

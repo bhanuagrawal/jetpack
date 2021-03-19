@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    android:background="#000"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout>
 
-    <RelativeLayout
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_marginBottom="35dp"
-        android:layout_marginTop="25dp"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false"
+        android:background="#000"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/all_appps_viewpager"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_marginBottom="35dp"
+            android:layout_marginTop="25dp"
+            android:layout_height="wrap_content">
 
-        </androidx.viewpager.widget.ViewPager>
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/all_appps_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 
-        <com.google.android.material.tabs.TabLayout
-            android:layout_alignParentBottom="true"
-            android:id="@+id/tabDots"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabGravity="center"
-            app:tabBackground="@drawable/tab_selector"
-            app:tabIndicatorHeight="0dp"/>
+            </androidx.viewpager.widget.ViewPager>
+
+            <com.google.android.material.tabs.TabLayout
+                android:layout_alignParentBottom="true"
+                android:id="@+id/tabDots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabGravity="center"
+                app:tabBackground="@drawable/tab_selector"
+                app:tabIndicatorHeight="0dp"/>
 
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-</FrameLayout>
+    </FrameLayout>
+</layout>

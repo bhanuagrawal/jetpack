@@ -18,11 +18,13 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.AppUtils;
+import agrawal.bhanu.jetpack.databinding.FragmentAppsBinding;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +34,8 @@ import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
  * Use the {@link Apps#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+@AndroidEntryPoint
 public class Apps extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,11 +47,11 @@ public class Apps extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private RecyclerView appRV;
     private AppsAdapter appAppsAdapter;
     private LauncherViewModel mAppsModel;
     private int position;
     private GridLayoutManager layoutManager;
+    private FragmentAppsBinding binding;
 
     public Apps() {
         // Required empty public constructor
@@ -85,7 +89,7 @@ public class Apps extends Fragment {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {
                 layoutManager.setSpanCount(mAppsModel.getColumn_count());
-                appRV.setLayoutManager(layoutManager);
+                binding.applist.setLayoutManager(layoutManager);
                 appAppsAdapter.setApps(AppUtils.getApps(appsInfo, mAppsModel.getAppsCountPerPage(), position));
             }
         };
@@ -97,12 +101,11 @@ public class Apps extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the rootLayout for this fragment
-        View view = inflater.inflate(R.layout.fragment_apps, container, false);
-        appRV = (RecyclerView)view.findViewById(R.id.applist);
-        appRV.setLayoutManager(layoutManager);
-        registerForContextMenu(appRV);
-        appRV.setAdapter(appAppsAdapter);
-        return view;
+        binding = FragmentAppsBinding.inflate(inflater, container, false);
+        binding.applist.setLayoutManager(layoutManager);
+        registerForContextMenu(binding.applist);
+        binding.applist.setAdapter(appAppsAdapter);
+        return binding.getRoot();
     }
 
 

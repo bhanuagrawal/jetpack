@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack.reddit.ui;
 
 import android.app.WallpaperManager;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import android.content.Context;
@@ -22,12 +23,11 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.FragmentItemListBinding;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.reddit.model.Post;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+import dagger.hilt.android.AndroidEntryPoint;
 
 
 /**
@@ -38,6 +38,7 @@ import butterknife.Unbinder;
  * Use the {@link ItemsList#newInstance} factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 public class ItemsList extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -52,29 +53,13 @@ public class ItemsList extends Fragment {
     private RedditPostViewModel postViewModel;
     private int pageNo;
 
-    @BindView(R.id.itemlist)
-    RecyclerView itemRV;
 
     @Inject
     public ItemsAdapter itemsAdapter;
 
     @Inject
     WallpaperManager wallpaperManager;
-
-    @BindView(R.id.errorMSG)
-    TextView errorMsg;
-
-    @BindView(R.id.error_layout)
-    RelativeLayout errorLayout;
-
-    @BindView(R.id.swiperefresh)
-    SwipeRefreshLayout swipeToRefresh;
-
-    @BindView(R.id.retry)
-    TextView retry;
-
-
-    private Unbinder uibinder;
+    private FragmentItemListBinding binding;
 
 
     public ItemsList() {
@@ -106,9 +91,8 @@ public class ItemsList extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        ((MyApp)getActivity().getApplication()).getWebComponent().inject(this);
 
-        postViewModel = ViewModelProviders.of(getActivity()).get(RedditPostViewModel.class);
+        postViewModel = new ViewModelProvider(getActivity()).get(RedditPostViewModel.class);
         final Observer<PagedList<Post>> postObserver = new Observer<PagedList<Post>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Post> pagedList) {
@@ -129,9 +113,9 @@ public class ItemsList extends Fragment {
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
                 if(networkState != null){
-                    swipeToRefresh.setRefreshing(networkState == NetworkState.LOADING);
-                    itemRV.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
-                    errorLayout.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
+                    binding.swiperefresh.setRefreshing(networkState == NetworkState.LOADING);
+                    binding.itemlist.setVisibility(networkState.getStatus() == Status.FAILDED?View.GONE:View.VISIBLE);
+                    binding.errorLayout.setVisibility(networkState.getStatus() == Status.FAILDED?View.VISIBLE:View.GONE);
 
                 }
 
@@ -152,18 +136,16 @@ public class ItemsList extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-        uibinder = ButterKnife.bind(this, view);
-        itemRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        itemRV.setAdapter(itemsAdapter);
-        swipeToRefresh = (SwipeRefreshLayout)view.findViewById(R.id.swiperefresh);
-        swipeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        binding = FragmentItemListBinding.inflate(inflater, container, false);
+        binding.itemlist.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.itemlist.setAdapter(itemsAdapter);
+        binding.swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 postViewModel.onRefresh();
             }
         });
-        retry.setOnClickListener(new View.OnClickListener() {
+        binding.retry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 postViewModel.onRefresh();
@@ -177,7 +159,7 @@ public class ItemsList extends Fragment {
         }
 */
 
-        return view;
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -223,6 +205,5 @@ public class ItemsList extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        uibinder.unbind();
     }
 }

@@ -1,6 +1,4 @@
 package agrawal.bhanu.jetpack.network;
-import android.app.Application;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -10,18 +8,19 @@ import com.android.volley.toolbox.StringRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.network.model.RequestDetails;
 
+@Singleton
 public class WebService {
 
-    @Inject RequestQueue mRequestQueue;
-    Application application;
+    RequestQueue mRequestQueue;
 
-    public WebService(Application application) {
-        this.application = application;
-        ((MyApp)application).getWebComponent().inject(this);
+    @Inject
+    public WebService(RequestQueue mRequestQueue) {
+        this.mRequestQueue = mRequestQueue;
 
     }
 

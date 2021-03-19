@@ -22,13 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.DialogFragmentAppsBinding;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.ui.AppsAdapter;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -48,16 +45,12 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
     private String folderName;
 
     private OnFragmentInteractionListener mListener;
-    @BindView(R.id.applist)
-    RecyclerView appRV;
 
-    @BindView(R.id.folder_title)
-    TextView folderTitleTv;
 
     private AppsAdapter appAppsAdapter;
     private GridLayoutManager layoutManager;
     private LauncherViewModel mAppsModel;
-    private Unbinder uibinder;
+    private DialogFragmentAppsBinding binding;
 
 
     public AppsFolderDialogFragmnet() {
@@ -110,22 +103,19 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
             dialog.setDismissMessage(null);
         }
         super.onDestroyView();
-        uibinder.unbind();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.dialog_fragment_apps, container, false);
-        uibinder = ButterKnife.bind(this, view);
+        binding = DialogFragmentAppsBinding.inflate(inflater, container, false);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        folderTitleTv.setText(folderName);
-        appRV.setAdapter(appAppsAdapter);
+        binding.folderTitle.setText(folderName);
+        binding.applist.setAdapter(appAppsAdapter);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         layoutManager.setSpanCount(3);
-        appRV.setLayoutManager(layoutManager);
-        return view;
+        binding.applist.setLayoutManager(layoutManager);
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

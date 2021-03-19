@@ -2,6 +2,8 @@ package agrawal.bhanu.jetpack.reddit.ui;
 
 import android.app.Application;
 import androidx.paging.PagedListAdapter;
+
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import androidx.annotation.NonNull;
@@ -18,21 +20,21 @@ import com.squareup.picasso.Picasso;
 
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.NetworkStateItemBinding;
+import agrawal.bhanu.jetpack.databinding.RowItemBinding;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.reddit.model.Post;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder> {
 
-    Application mApplication;
+    private final Context context;
     private NetworkState networkState;
     private RetryCallback retryCallback;
 
-    public ItemsAdapter(Application application) {
+    public ItemsAdapter(Context context) {
         super(Post.DIFF_CALLBACK);
-        mApplication = application;
+        this.context = context;
     }
 
 
@@ -44,10 +46,10 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
         LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
 
         if(viewType == R.layout.row_item){
-            return new ItemViewHolder(layoutInflater.inflate(viewType, viewGroup, false));
+            return new ItemViewHolder(RowItemBinding.inflate(layoutInflater, viewGroup, false));
         }
         else if(viewType == R.layout.network_state_item){
-            return new NetworkStateViewHolder(layoutInflater.inflate(viewType, viewGroup, false));
+            return new NetworkStateViewHolder(NetworkStateItemBinding.inflate(layoutInflater, viewGroup, false));
         }
         else{
             return null;
@@ -121,29 +123,13 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
 
     class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.title)
-        public TextView titleTV;
 
-        @BindView(R.id.free_text)
-        public TextView freeTextTv;
+        private final RowItemBinding binding;
 
-        @BindView(R.id.subreddit)
-        public TextView subredditTV;
-
-        @BindView(R.id.upvotes)
-        public TextView upvotesTv;
-
-
-        @BindView(R.id.parentlayout)
-        public ConstraintLayout parentLayout;
-
-        @BindView(R.id.image)
-        public ImageView imageView;
-
-        public ItemViewHolder(View view) {
-            super(view);
-            ButterKnife.bind(this, view);
-            parentLayout.setOnClickListener(this);
+        public ItemViewHolder(RowItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.parentlayout.setOnClickListener(this);
         }
 
         @Override
@@ -151,25 +137,25 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
             int position = getAdapterPosition();
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.REDDIT_BASE_URL + getItem(position).getData().getPermalink()));
             browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mApplication.startActivity(browserIntent);
+            context.startActivity(browserIntent);
 
         }
 
         public void bindTo(final Post post) {
-            titleTV.setText(post.getData().getTitle());
-            freeTextTv.setText(post.getData().getSelftext());
-            subredditTV.setText(post.getData().getSubreddit());
-            upvotesTv.setText(String.valueOf(post.getData().getUps()) + " Upvotes");
+            binding.title.setText(post.getData().getTitle());
+            binding.freeText.setText(post.getData().getSelftext());
+            binding.subreddit.setText(post.getData().getSubreddit());
+            binding.upvotes.setText(String.valueOf(post.getData().getUps()) + " Upvotes");
             Picasso.get()
                     .load(post.getData().getThumbnail()) // thumbnail url goes here
-                    .into(imageView, new Callback() {
+                    .into(binding.image, new Callback() {
                         @Override
                         public void onSuccess() {
                             Picasso.get()
                                     .load(post.getData().getUrl()) // image url goes here
-                                    .placeholder(imageView.getDrawable())
+                                    .placeholder(binding.image.getDrawable())
                                     .fit()
-                                    .into(imageView);
+                                    .into(binding.image);
                         }
 
                         @Override
@@ -185,15 +171,12 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
 
     class NetworkStateViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView loadingTv;
-        public TextView errorMsgTv;
-        public TextView retryTv;
-        public NetworkStateViewHolder(@NonNull View itemView) {
-            super(itemView);
-            loadingTv = (TextView) itemView.findViewById(R.id.loading);
-            errorMsgTv = (TextView) itemView.findViewById(R.id.error);
-            retryTv = (TextView) itemView.findViewById(R.id.retry);
-            retryTv.setOnClickListener(new View.OnClickListener() {
+        private final NetworkStateItemBinding binding;
+
+        public NetworkStateViewHolder(@NonNull NetworkStateItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.retry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     retryCallback.retry();
@@ -202,9 +185,9 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
         }
 
         public void bindTo(NetworkState networkState) {
-            loadingTv.setVisibility(networkState.getStatus() == Status.LOADING? View.VISIBLE: View.GONE);
-            errorMsgTv.setVisibility(networkState.getStatus() == Status.FAILDED? View.VISIBLE: View.GONE);
-            retryTv.setVisibility(networkState.getStatus() == Status.FAILDED? View.VISIBLE: View.GONE);
+            binding.loading.setVisibility(networkState.getStatus() == Status.LOADING? View.VISIBLE: View.GONE);
+            binding.error.setVisibility(networkState.getStatus() == Status.FAILDED? View.VISIBLE: View.GONE);
+            binding.retry.setVisibility(networkState.getStatus() == Status.FAILDED? View.VISIBLE: View.GONE);
         }
     }
 

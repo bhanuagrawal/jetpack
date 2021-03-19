@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
@@ -17,9 +18,9 @@ import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.reddit.model.Post;
 import agrawal.bhanu.jetpack.reddit.model.RedditFeed;
 
+@Singleton
 public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
 
-    @Inject
     PostRepository postRepository;
     Executor retryExecuter;
     private MutableLiveData networkState;
@@ -35,11 +36,12 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
         return initloading;
     }
 
-    public ItemKeyedPostDataSource(Application application, Executor retryExecuter) {
+    @Inject
+    public ItemKeyedPostDataSource( Executor retryExecuter, PostRepository postRepository) {
         this.retryExecuter = retryExecuter;
+        this.postRepository = postRepository;
         networkState = new MutableLiveData();
         initloading = new MutableLiveData();
-        ((MyApp)application).getWebComponent().inject(this);
     }
 
     public MutableLiveData getNetworkState() {

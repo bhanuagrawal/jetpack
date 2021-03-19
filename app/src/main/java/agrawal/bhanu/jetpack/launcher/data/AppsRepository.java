@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.MainActivity;
@@ -44,19 +45,20 @@ import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 
-
+@Singleton
 public class AppsRepository {
 
     private final PackageManager packageManager;
-    @Inject Gson gson;
-    @Inject SharedPreferences sharedPreferences;
-    @Inject LauncherDatabase database;
-    Application application;
+    Gson gson;
+    LauncherDatabase database;
+    Context context;
 
-    public AppsRepository(Application application) {
-        this.application = application;
-        packageManager = application.getPackageManager();
-        ((MyApp)application).getLocalDataComponent().inject(this);
+    @Inject
+    public AppsRepository(Context context, Gson gson, LauncherDatabase database) {
+        this.context = context;
+        packageManager = context.getPackageManager();
+        this.gson = gson;
+        this.database = database;
     }
 
     public void fetchApps(MutableLiveData<AppsInfo> mCurrentApps) {
@@ -188,8 +190,8 @@ public class AppsRepository {
     private App getDefaultMessagingApp() {
         Intent intent;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            String defaultApplication = Settings.Secure.getString(application.getContentResolver(),  "sms_default_application");
-            PackageManager pm = application.getPackageManager();
+            String defaultApplication = Settings.Secure.getString(context.getContentResolver(),  "sms_default_application");
+            PackageManager pm = context.getPackageManager();
             intent = pm.getLaunchIntentForPackage(defaultApplication );
         } else {
             intent = new Intent(Intent.ACTION_MAIN);
@@ -227,7 +229,7 @@ public class AppsRepository {
 
     public int getAppRowCount() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+        WindowManager windowManager = (WindowManager) context.getApplicationContext()
                 .getSystemService(Context.WINDOW_SERVICE);
 
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -243,7 +245,7 @@ public class AppsRepository {
     public int getAppColumnCount() {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+        WindowManager windowManager = (WindowManager) context.getApplicationContext()
                 .getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
@@ -259,7 +261,7 @@ public class AppsRepository {
 
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+        WindowManager windowManager = (WindowManager) context.getApplicationContext()
                 .getSystemService(Context.WINDOW_SERVICE);
 
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -283,7 +285,7 @@ public class AppsRepository {
     public int getAppColumnCountForHome(int orientation) {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) application.getApplicationContext()
+        WindowManager windowManager = (WindowManager) context.getApplicationContext()
                 .getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
@@ -385,7 +387,7 @@ public class AppsRepository {
     }
 
     public void initializeHomePage() {
-        int orientation = application.getResources().getConfiguration().orientation;
+        int orientation = context.getResources().getConfiguration().orientation;
         int col_count = getAppColumnCountForHome(orientation);
         int row_count = getAppRowCountForHome(orientation)-2;
         for(int i=0; i<col_count*row_count; i++){

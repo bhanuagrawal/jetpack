@@ -5,6 +5,7 @@ import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import androidx.annotation.NonNull;
@@ -18,21 +19,23 @@ import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.reddit.data.PostDataSourceFactory;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.reddit.model.Post;
+import dagger.hilt.android.lifecycle.HiltViewModel;
 
-public class RedditPostViewModel extends AndroidViewModel {
+@HiltViewModel
+public class RedditPostViewModel extends ViewModel {
 
+    PostDataSourceFactory postDataSourceFactory;
     private LiveData<PagedList<Post>> postList;
     private LiveData<NetworkState> networkState;
     private LiveData<NetworkState> initloading;
 
 
-    @Inject
-    PostDataSourceFactory postDataSourceFactory;
-    @Inject Executor executor;
 
-    public RedditPostViewModel(@NonNull Application application) {
-        super(application);
-        ((MyApp)application).getWebComponent().inject(this);
+
+    @Inject
+    public RedditPostViewModel(PostDataSourceFactory postDataSourceFactory) {
+        super();
+        this.postDataSourceFactory = postDataSourceFactory;
     }
 
     public LiveData<PagedList<Post>> getPostList() {

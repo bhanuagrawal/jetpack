@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.DefaultPageBinding;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
@@ -38,8 +39,9 @@ import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
 import agrawal.bhanu.jetpack.launcher.ui.folder.FolderManager;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -48,6 +50,8 @@ import butterknife.ButterKnife;
  * Use the {@link DefaultPage#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+@AndroidEntryPoint
 public class DefaultPage extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,15 +65,6 @@ public class DefaultPage extends Fragment {
     private OnFragmentInteractionListener mListener;
     private LauncherViewModel mAppsModel;
 
-    @BindView(R.id.default_apps)
-    RecyclerView defaultApps;
-
-    @BindView(R.id.layout)
-    ConstraintLayout rootLayout;
-
-    @BindView(R.id.apps_folder_recyclerview)
-    RecyclerView appsFolderRecyclerview;
-
     @Inject
     Executor executor;
 
@@ -80,6 +75,7 @@ public class DefaultPage extends Fragment {
     private GridLayoutManager appsFolderLayoutManager;
     private AppsFolderAdapter appsFolderAdapter;
     private ItemTouchHelper ith;
+    private DefaultPageBinding binding;
 
     public DefaultPage() {
         // Required empty public constructor
@@ -111,7 +107,6 @@ public class DefaultPage extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         appsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.HOME);
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -131,7 +126,7 @@ public class DefaultPage extends Fragment {
             @Override
             public void onChanged(@Nullable Drawable drawable) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    rootLayout.setBackground(drawable);
+                    binding.layout.setBackground(drawable);
                 }
             }
         });
@@ -328,17 +323,16 @@ public class DefaultPage extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the rootLayout for this fragment
-        final View view = inflater.inflate(R.layout.default_page, container, false);
-        ButterKnife.bind(this, view);
-        defaultApps.setLayoutManager(layoutManager);
-        defaultApps.setAdapter(appsAdapter);
+        binding = DefaultPageBinding.inflate(inflater, container, false);
+        binding.defaultApps.setLayoutManager(layoutManager);
+        binding.defaultApps.setAdapter(appsAdapter);
 
-        appsFolderRecyclerview.setLayoutManager(appsFolderLayoutManager);
+        binding.appsFolderRecyclerview.setLayoutManager(appsFolderLayoutManager);
 
-        appsFolderRecyclerview.setAdapter(appsFolderAdapter);
-        ith.attachToRecyclerView(appsFolderRecyclerview);
+        binding.appsFolderRecyclerview.setAdapter(appsFolderAdapter);
+        ith.attachToRecyclerView(binding.appsFolderRecyclerview);
 
-        return view;
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

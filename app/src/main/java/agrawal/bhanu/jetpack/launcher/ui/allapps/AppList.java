@@ -21,9 +21,11 @@ import javax.inject.Inject;
 
 import agrawal.bhanu.jetpack.AppUtils;
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.databinding.FragmentAppListBinding;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +35,7 @@ import agrawal.bhanu.jetpack.launcher.ui.LauncherViewModel;
  * Use the {@link AppList#newInstance} factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 public class AppList extends Fragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -45,13 +48,12 @@ public class AppList extends Fragment{
 
     private OnFragmentInteractionListener mListener;
     private MyAdapter mAdapter;
-    private ViewPager appsViewPager;
     private LauncherViewModel mAppsModel;
-    private TabLayout tabLayout;
 
 
     @Inject
     WallpaperManager wallpaperManager;
+    private FragmentAppListBinding binding;
 
     public AppList() {
         // Required empty public constructor
@@ -84,7 +86,6 @@ public class AppList extends Fragment{
         }
 
 
-        ((MyApp)getActivity().getApplication()).getLocalDataComponent().inject(this);
         mAdapter = new MyAdapter(getChildFragmentManager());
         mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
@@ -99,12 +100,10 @@ public class AppList extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_app_list, container, false);
-        appsViewPager = (ViewPager) rootView.findViewById(R.id.all_appps_viewpager);
-        tabLayout = (TabLayout) rootView.findViewById(R.id.tabDots);
-        appsViewPager.setAdapter(mAdapter);
-        tabLayout.setupWithViewPager(appsViewPager);
-        return rootView;
+        binding = FragmentAppListBinding.inflate(inflater, container, false);
+        binding.allApppsViewpager.setAdapter(mAdapter);
+        binding.tabDots.setupWithViewPager(binding.allApppsViewpager);
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

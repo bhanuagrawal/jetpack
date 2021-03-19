@@ -1,73 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:beer="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:padding="10dp"
-    android:layout_margin="15dp"
-    android:id="@+id/parentlayout"
-    android:background="#15000000"
-    >
-
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:beer="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:text="TextView"
-        android:textColor="#000"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        beer:layout_constraintLeft_toLeftOf="parent" />
+        android:layout_centerHorizontal="true"
+        android:padding="10dp"
+        android:layout_margin="15dp"
+        android:id="@+id/parentlayout"
+        android:background="#15000000"
+        >
 
 
-    <TextView
-        android:id="@+id/subreddit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="#000"
-        android:textSize="12dp"
-        android:layout_margin="5dp"
-        beer:layout_constraintLeft_toLeftOf="parent"
-        beer:layout_constraintTop_toBottomOf="@id/title" />
-
-    <TextView
-        android:id="@+id/upvotes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="#000"
-        android:textSize="12dp"
-        android:layout_margin="5dp"
-        beer:layout_constraintLeft_toRightOf="@id/subreddit"
-        beer:layout_constraintTop_toBottomOf="@id/title" />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:text="TextView"
+            android:textColor="#000"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            beer:layout_constraintLeft_toLeftOf="parent" />
 
 
-    <TextView
-        android:id="@+id/free_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="#000"
-        android:textSize="15dp"
-        beer:layout_constraintLeft_toLeftOf="parent"
-        beer:layout_constraintTop_toBottomOf="@id/subreddit" />
+        <TextView
+            android:id="@+id/subreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textColor="#000"
+            android:textSize="12dp"
+            android:layout_margin="5dp"
+            beer:layout_constraintLeft_toLeftOf="parent"
+            beer:layout_constraintTop_toBottomOf="@id/title" />
 
-    <ImageView
-        beer:layout_constraintLeft_toLeftOf="parent"
-        beer:layout_constraintRight_toRightOf="parent"
-        android:scaleType="fitCenter"
-        android:id="@+id/image"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        beer:layout_constraintTop_toBottomOf="@id/free_text"
-        beer:srcCompat="@android:color/transparent" />
+        <TextView
+            android:id="@+id/upvotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textColor="#000"
+            android:textSize="12dp"
+            android:layout_margin="5dp"
+            beer:layout_constraintLeft_toRightOf="@id/subreddit"
+            beer:layout_constraintTop_toBottomOf="@id/title" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/free_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textColor="#000"
+            android:textSize="15dp"
+            beer:layout_constraintLeft_toLeftOf="parent"
+            beer:layout_constraintTop_toBottomOf="@id/subreddit" />
+
+        <ImageView
+            beer:layout_constraintLeft_toLeftOf="parent"
+            beer:layout_constraintRight_toRightOf="parent"
+            android:scaleType="fitCenter"
+            android:id="@+id/image"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            beer:layout_constraintTop_toBottomOf="@id/free_text"
+            beer:srcCompat="@android:color/transparent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

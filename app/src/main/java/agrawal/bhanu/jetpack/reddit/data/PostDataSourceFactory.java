@@ -1,5 +1,7 @@
 package agrawal.bhanu.jetpack.reddit.data;
 import android.app.Application;
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
@@ -7,24 +9,22 @@ import androidx.paging.DataSource;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.MyApp;
 
-
+@Singleton
 public class PostDataSourceFactory extends DataSource.Factory {
 
-    @Inject
     ItemKeyedPostDataSource itemKeyedPostDataSource;
-    @Inject
     Executor executor;
     MutableLiveData<ItemKeyedPostDataSource> mutableLiveData;
-    Application application;
 
-    public PostDataSourceFactory(Application application) {
-        this.application = application;
+    @Inject
+    public PostDataSourceFactory(Executor executor, ItemKeyedPostDataSource itemKeyedPostDataSource) {
         this.mutableLiveData = new MutableLiveData<ItemKeyedPostDataSource>();
-        ((MyApp)application).getWebComponent().inject(this);
-
+        this.executor = executor;
+        this.itemKeyedPostDataSource = itemKeyedPostDataSource;
     }
 
     public LiveData<ItemKeyedPostDataSource> getMutableLiveData() {
@@ -33,7 +33,6 @@ public class PostDataSourceFactory extends DataSource.Factory {
 
     @Override
     public androidx.paging.DataSource create() {
-        ((MyApp)application).getWebComponent().inject(this);
         mutableLiveData.postValue(itemKeyedPostDataSource);
         return itemKeyedPostDataSource;
     }

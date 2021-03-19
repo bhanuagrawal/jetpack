@@ -8,10 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.RowAppBinding;
+import agrawal.bhanu.jetpack.databinding.RowAppFolderBinding;
+import agrawal.bhanu.jetpack.databinding.RowAppHomeBinding;
 import agrawal.bhanu.jetpack.launcher.data.entities.App;
 import agrawal.bhanu.jetpack.launcher.ui.viewholder.AppViewHolder;
 
@@ -53,26 +58,19 @@ public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     @Override
     public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View itemView;
 
         switch (viewType){
 
             case ALL_APPS:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType, context);
+                return new AppViewHolder(RowAppBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
             case HOME:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app_home, parent, false);
-                return new AppViewHolder(itemView, viewType, context);
+                return new AppViewHolder(RowAppHomeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
             case FOLDER:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app_folder, parent, false);
-                return new AppViewHolder(itemView, viewType, context);
+                return new AppViewHolder(RowAppFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
+
             default:
-                itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_app, parent, false);
-                return new AppViewHolder(itemView, viewType, context);
+                return new AppViewHolder(RowAppBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
+
 
         }
 
@@ -83,8 +81,8 @@ public class AppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
     @Override
     public void onBindViewHolder(AppViewHolder holder, final int position) {
-        holder.appNameTV.setText(apps.get(position).getAppName());
-        holder.appIconIV.setImageDrawable(mAppsModel.getAppIcon(apps.get(position).getAppPackage()));
+        ((TextView)holder.itemView.findViewById(R.id.app_name)).setText(apps.get(position).getAppName());
+        ((ImageView)holder.itemView.findViewById(R.id.app_icon)).setImageDrawable(mAppsModel.getAppIcon(apps.get(position).getAppPackage()));
         holder.setApp(apps.get(position));
     }
 

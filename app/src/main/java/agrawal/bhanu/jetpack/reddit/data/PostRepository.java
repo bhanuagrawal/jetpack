@@ -1,6 +1,7 @@
 package agrawal.bhanu.jetpack.reddit.data;
 
 import android.app.Application;
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.MyApp;
@@ -18,17 +20,19 @@ import agrawal.bhanu.jetpack.network.model.RequestDetails;
 import agrawal.bhanu.jetpack.network.WebService;
 import agrawal.bhanu.jetpack.reddit.model.RedditFeed;
 
+@Singleton
 public class PostRepository implements WebService.HtttpResponseListner {
 
-    Application application;
-    @Inject WebService webService;
-    @Inject Gson gson;
-    @Inject Uri.Builder urlBuilder;
+    WebService webService;
+    Gson gson;
+    Uri.Builder urlBuilder;
 
 
-    public PostRepository(Application application) {
-        this.application = application;
-        ((MyApp)application).getWebComponent().inject(this);
+    @Inject
+    public PostRepository(Gson gson, Uri.Builder uriBuilder, WebService webService) {
+        this.gson = gson;
+        this.urlBuilder =uriBuilder;
+        this.webService = webService;
     }
 
     public Object parseData(RequestDetails requestDetails, String response){

@@ -16,12 +16,14 @@ import android.view.ViewGroup;
 
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.R;
+import agrawal.bhanu.jetpack.databinding.FragmentHomeBinding;
 import agrawal.bhanu.jetpack.launcher.ui.allapps.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +33,8 @@ import butterknife.Unbinder;
  * Use the {@link Home#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+@AndroidEntryPoint
 public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,13 +46,11 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private Unbinder uibinder;
 
-    @BindView(R.id.home_viewpager)
-    ViewPager homeViewPager;
-    private HomeViewPagerAdapter adapter;
+    private FragmentHomeBinding binding;
     private int pagerNo;
     private int currentPage = Constants.DEFAULT_PAGE_POSITION;
+    private HomeViewPagerAdapter adapter;
 
     public Home() {
         // Required empty public constructor
@@ -93,18 +95,18 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the rootLayout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        uibinder = ButterKnife.bind(this, view);
-        homeViewPager.setAdapter(adapter);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+
+        binding.homeViewpager.setAdapter(adapter);
         if(savedInstanceState != null &&
                 savedInstanceState.containsKey("currentPage")){
 
             Log.d("currentPageReceived", String.valueOf(savedInstanceState.getInt("currentPage")));
             currentPage = savedInstanceState.getInt("currentPage");
         }
-        homeViewPager.setCurrentItem(currentPage);
-        homeViewPager.addOnPageChangeListener(this);
-        return view;
+        binding.homeViewpager.setCurrentItem(currentPage);
+        binding.homeViewpager.addOnPageChangeListener(this);
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -117,8 +119,8 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("currentPage", String.valueOf(homeViewPager.getCurrentItem()));
-        outState.putInt("currentPage", homeViewPager.getCurrentItem());
+        Log.d("currentPage", String.valueOf(binding.homeViewpager.getCurrentItem()));
+        outState.putInt("currentPage", binding.homeViewpager.getCurrentItem());
     }
 
 
@@ -158,7 +160,7 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     }
 
     public void onBackPressed() {
-        homeViewPager.setCurrentItem(Constants.DEFAULT_PAGE_POSITION, true);
+        binding.homeViewpager.setCurrentItem(Constants.DEFAULT_PAGE_POSITION, true);
     }
 
     /**
@@ -180,7 +182,6 @@ public class Home extends Fragment implements ViewPager.OnPageChangeListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        uibinder.unbind();
     }
 
     public static class HomeViewPagerAdapter extends FragmentStatePagerAdapter {
