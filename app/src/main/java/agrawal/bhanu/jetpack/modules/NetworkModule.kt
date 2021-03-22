@@ -16,6 +16,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.Executor
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -30,14 +31,14 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providesWebService(requestQueue: RequestQueue): WebService {
+    fun providesWebService( requestQueue: RequestQueue): WebService {
         return WebService(requestQueue)
     }
 
     @Provides
     @Singleton
-    fun providePostDataSourceFactory(executor: Executor, itemKeyedPostDataSource: ItemKeyedPostDataSource): PostDataSourceFactory {
-        return PostDataSourceFactory(executor, itemKeyedPostDataSource)
+    fun providePostDataSourceFactory(provider: Provider<ItemKeyedPostDataSource>): PostDataSourceFactory {
+        return PostDataSourceFactory(provider)
     }
 
     @Provides

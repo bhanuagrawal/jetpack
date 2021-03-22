@@ -17,6 +17,7 @@ import javax.inject.Inject
 class RedditPostViewModel @Inject constructor(
         var postDataSourceFactory: PostDataSourceFactory
 ) : ViewModel() {
+
     var postList: LiveData<PagedList<Post?>>? = null
         get() {
             if (field == null) {
@@ -30,15 +31,15 @@ class RedditPostViewModel @Inject constructor(
         }
         private set
 
-    var networkState: LiveData<NetworkState?> = Transformations.map(
+    val networkState: LiveData<NetworkState?> = Transformations.switchMap(
+            postDataSourceFactory.mutableLiveData
+        ){
+            it.networkState as LiveData<NetworkState?>
+        }
+    val initloading: LiveData<NetworkState?> = Transformations.switchMap(
             postDataSourceFactory.mutableLiveData
     ){
-        it.networkState
-    }
-    var initloading: LiveData<NetworkState?> = Transformations.map(
-            postDataSourceFactory.mutableLiveData
-    ){
-        it.initloading
+        it.initloading as LiveData<NetworkState?>
     }
 
 
