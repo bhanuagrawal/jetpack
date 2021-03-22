@@ -44,7 +44,7 @@ public class Post implements Serializable {
 
         @Override
         public boolean areContentsTheSame(@NonNull Post oldItem, @NonNull Post newItem) {
-            return oldItem == newItem;
+            return oldItem.equals(newItem);
         }
     };
 }

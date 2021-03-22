@@ -9,12 +9,9 @@ import androidx.paging.DataSource;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+import agrawal.bhanu.jetpack.reddit.model.Post;
 
-import agrawal.bhanu.jetpack.MyApp;
-
-@Singleton
-public class PostDataSourceFactory extends DataSource.Factory {
+public class PostDataSourceFactory extends DataSource.Factory<String, Post> {
 
     ItemKeyedPostDataSource itemKeyedPostDataSource;
     Executor executor;

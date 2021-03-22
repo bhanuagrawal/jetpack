@@ -165,9 +165,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 return new FolderViewHolder(RowFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
             default:
-                return new AppViewHolder(RowAppContainerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), viewType, context);
-
-
+                return new FolderViewHolder(RowFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
 
 

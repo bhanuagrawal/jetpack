@@ -20,9 +20,6 @@ import agrawal.bhanu.jetpack.databinding.FragmentHomeBinding;
 import agrawal.bhanu.jetpack.launcher.ui.allapps.AppList;
 import agrawal.bhanu.jetpack.launcher.ui.defaultpage.DefaultPage;
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import dagger.hilt.android.AndroidEntryPoint;
 
 /**

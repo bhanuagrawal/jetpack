@@ -23,8 +23,8 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
 
     PostRepository postRepository;
     Executor retryExecuter;
-    private MutableLiveData networkState;
-    private MutableLiveData initloading;
+    private NetworkState networkState;
+    private NetworkState initloading;
     private Runnable retryTask;
 
     @Override
@@ -32,7 +32,7 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
         super.invalidate();
     }
 
-    public MutableLiveData getInitloading() {
+    public NetworkState getInitloading() {
         return initloading;
     }
 
@@ -40,11 +40,9 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
     public ItemKeyedPostDataSource( Executor retryExecuter, PostRepository postRepository) {
         this.retryExecuter = retryExecuter;
         this.postRepository = postRepository;
-        networkState = new MutableLiveData();
-        initloading = new MutableLiveData();
     }
 
-    public MutableLiveData getNetworkState() {
+    public NetworkState getNetworkState() {
         return networkState;
     }
 
@@ -59,21 +57,21 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
     public void loadInitial(@NonNull final LoadInitialParams<String> params, @NonNull final LoadInitialCallback<Post> callback) {
 
 
-        networkState.postValue(NetworkState.LOADING);
-        initloading.postValue(NetworkState.LOADING);
+        networkState  = NetworkState.LOADING;
+        initloading  = NetworkState.LOADING;
         postRepository.fetchPosts(String.valueOf(params.requestedLoadSize), null,"10",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         callback.onResult(((RedditFeed)postRepository.parsePostResponse(response)).getMetaData().getChildren());
-                        networkState.postValue(NetworkState.LOADED);
-                        initloading.postValue(NetworkState.LOADED);
+                        networkState  = NetworkState.LOADED;
+                        initloading  = NetworkState.LOADED;
                     }},
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        networkState.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
-                        initloading.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
+                        networkState  = new NetworkState(Status.FAILDED, error.getMessage());
+                        initloading  = new NetworkState(Status.FAILDED, error.getMessage());
                         retryTask = new Runnable() {
                             @Override
                             public void run() {
@@ -89,19 +87,19 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
     @Override
     public void loadAfter(@NonNull final LoadParams<String> params, @NonNull final LoadCallback<Post> callback) {
 
-        networkState.postValue(NetworkState.LOADING);
+        networkState  = NetworkState.LOADING;
         postRepository.fetchPosts(String.valueOf(params.requestedLoadSize), String.valueOf(params.key),"10",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         callback.onResult(((RedditFeed)postRepository.parsePostResponse(response)).getMetaData().getChildren());
-                        networkState.postValue(NetworkState.LOADED);
+                        networkState  = NetworkState.LOADED;
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        networkState.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
+                        networkState  = new NetworkState(Status.FAILDED, error.getMessage());
                         retryTask = new Runnable() {
                             @Override
                             public void run() {

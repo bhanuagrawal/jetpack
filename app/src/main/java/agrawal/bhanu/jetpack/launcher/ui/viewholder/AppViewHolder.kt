@@ -31,7 +31,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppViewHolder @Inject constructor(private val binding: ViewBinding, viewType: Int, context: Context) : RecyclerView.ViewHolder(binding.getRoot()), View.OnClickListener, OnLongClickListener {
+class AppViewHolder @Inject constructor(binding: ViewBinding, viewType: Int, context: Context) : RecyclerView.ViewHolder(binding.getRoot()), View.OnClickListener, OnLongClickListener {
     private val context: Context
     private val mAppsModel: LauncherViewModel
     private var app: App? = null

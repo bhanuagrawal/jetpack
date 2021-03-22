@@ -30,7 +30,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providesWebService(@ApplicationContext requestQueue: RequestQueue): WebService {
+    fun providesWebService(requestQueue: RequestQueue): WebService {
         return WebService(requestQueue)
     }
 
