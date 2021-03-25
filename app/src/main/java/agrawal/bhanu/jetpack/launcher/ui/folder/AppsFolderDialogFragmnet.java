@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack.launcher.ui.folder;
 
 import android.app.Dialog;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
@@ -84,7 +85,7 @@ public class AppsFolderDialogFragmnet extends DialogFragment {
             folderName = getArguments().getString(ARG_PARAM2);
         }
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER_DIALOG);
-        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
+        mAppsModel = new ViewModelProvider(getActivity()).get(LauncherViewModel.class);
 
         mAppsModel.getAppsByFolderId(folderId).observe(getActivity(), new Observer<List<App>>() {
             @Override

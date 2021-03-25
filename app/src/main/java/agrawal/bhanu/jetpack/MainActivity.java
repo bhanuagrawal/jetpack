@@ -1,6 +1,8 @@
 
 package agrawal.bhanu.jetpack;
 import android.Manifest;
+
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -87,10 +89,10 @@ implements ItemsList.OnFragmentInteractionListener,
             public void onReceive(Context context, Intent intent) {
                 Log.d("wallpapeer", "changes");
                 if(intent.getAction() == Intent.ACTION_WALLPAPER_CHANGED){
-                    ViewModelProviders.of(MainActivity.this).get(LauncherViewModel.class).onWallpaperChange();
+                   new ViewModelProvider(MainActivity.this).get(LauncherViewModel.class).onWallpaperChange();
                 }
                 else{
-                    ViewModelProviders.of(MainActivity.this).get(LauncherViewModel.class).onAppListChange();
+                    new ViewModelProvider(MainActivity.this).get(LauncherViewModel.class).onAppListChange();
                 }
 
             }

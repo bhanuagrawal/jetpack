@@ -23,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -117,6 +118,6 @@ class AppViewHolder @Inject constructor(binding: ViewBinding, viewType: Int, con
             itemView.findViewById<ConstraintLayout>(R.id.parentlayout).setOnClickListener(this)
         }
         this.context = context
-        mAppsModel = ViewModelProviders.of((context as AppCompatActivity)).get(LauncherViewModel::class.java)
+        mAppsModel =  ViewModelProvider((context as AppCompatActivity)).get(LauncherViewModel::class.java)
     }
 }

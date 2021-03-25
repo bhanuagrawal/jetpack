@@ -7,9 +7,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
 
 
 import java.util.ArrayList;
@@ -30,29 +33,26 @@ import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
 import dagger.hilt.android.lifecycle.HiltViewModel;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @HiltViewModel
-public class LauncherViewModel extends AndroidViewModel {
+public class LauncherViewModel extends ViewModel {
 
+    private  Context appContext;
     private MutableLiveData<AppsInfo> mCurrentApps;
     private MutableLiveData<Drawable> wallpaper;
     private LiveData<List<WidgetsMetaData>> widgetMetaData;
-    private Application application;
-    @Inject
     AppsRepository appsRepository;
-
-
-    @Inject
     Executor executor;
-
-    @Inject
     WallpaperManager wallpaperManager;
 
 
     @Inject
-    public LauncherViewModel(@NonNull Application application) {
-        super(application);
-        this.application = application;
+    public LauncherViewModel(@ApplicationContext Context appContext, WallpaperManager wallpaperManager, AppsRepository appsRepository, Executor executor) {
+        this.appContext = appContext;
+        this.appsRepository = appsRepository;
+        this.executor = executor;
+        this.wallpaperManager = wallpaperManager;
     }
 
     public LiveData<List<WidgetsMetaData>> getWidgetsLiveMetadata() {
@@ -103,7 +103,7 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public void onWallpaperChange() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
-                AppUtils.checkIfAlreadyhavePermission(application)) {
+                AppUtils.checkIfAlreadyhavePermission(appContext)) {
             wallpaper.setValue(wallpaperManager.getDrawable());
         }
     }
@@ -112,7 +112,7 @@ public class LauncherViewModel extends AndroidViewModel {
         if(wallpaper == null){
             wallpaper = new MutableLiveData<>();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
-                    AppUtils.checkIfAlreadyhavePermission(application)) {
+                    AppUtils.checkIfAlreadyhavePermission(appContext)) {
                 wallpaper.setValue(wallpaperManager.getDrawable());
             }
         }

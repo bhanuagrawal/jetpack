@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack.launcher.ui.allapps;
 
 import android.app.WallpaperManager;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
@@ -87,7 +88,7 @@ public class AppList extends Fragment{
 
 
         mAdapter = new MyAdapter(getChildFragmentManager());
-        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
+        mAppsModel = new ViewModelProvider(getActivity()).get(LauncherViewModel.class);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
             @Override
             public void onChanged(@Nullable final AppsInfo appsInfo) {

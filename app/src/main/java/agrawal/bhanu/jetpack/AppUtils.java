@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack;
 
 import android.Manifest;
 import android.app.Application;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import androidx.core.content.ContextCompat;
 
@@ -20,8 +21,8 @@ public class AppUtils {
         return (int) Math.ceil((float) appsInfo.getApps().size() / appsPerPage);
     }
 
-    public static boolean checkIfAlreadyhavePermission(Application application) {
-        int result = ContextCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+    public static boolean checkIfAlreadyhavePermission(Context context) {
+        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {

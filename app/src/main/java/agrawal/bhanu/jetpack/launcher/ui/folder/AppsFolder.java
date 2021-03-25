@@ -2,6 +2,7 @@ package agrawal.bhanu.jetpack.launcher.ui.folder;
 
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
@@ -110,7 +111,7 @@ public class AppsFolder extends Fragment implements  LifecycleObserver{
 
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.FOLDER);
-        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
+        mAppsModel = new ViewModelProvider(getActivity()).get(LauncherViewModel.class);
 
         mAppsModel.getFolderById(folderId).observe(getActivity(), new Observer<FolderWidget>() {
 

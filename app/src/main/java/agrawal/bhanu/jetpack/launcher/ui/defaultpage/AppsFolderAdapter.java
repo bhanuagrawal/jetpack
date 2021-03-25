@@ -1,5 +1,6 @@
 package agrawal.bhanu.jetpack.launcher.ui.defaultpage;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
@@ -79,7 +80,7 @@ public class AppsFolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public AppsFolderAdapter(Context context, ArrayList<WidgetsMetaData> widgetsMetaData) {
         this.context = context;
         this.widgetsMetaData = widgetsMetaData;
-        mAppsModel = ViewModelProviders.of((AppCompatActivity)context).get(LauncherViewModel.class);
+        mAppsModel = new ViewModelProvider((AppCompatActivity)context).get(LauncherViewModel.class);
         folderMananger = new FolderManager(context);
     }
 

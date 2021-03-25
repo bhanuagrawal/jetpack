@@ -1,6 +1,7 @@
 package agrawal.bhanu.jetpack.launcher.ui.allapps;
 
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
@@ -82,7 +83,7 @@ public class Apps extends Fragment {
             position = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAppsModel = ViewModelProviders.of(getActivity()).get(LauncherViewModel.class);
+        mAppsModel =new ViewModelProvider(getActivity()).get(LauncherViewModel.class);
         layoutManager = new GridLayoutManager(getActivity(), 1);
         appAppsAdapter = new AppsAdapter(getActivity(), new ArrayList<App>(), AppsAdapter.ALL_APPS);
         final Observer<AppsInfo> appsObserver = new Observer<AppsInfo>() {
