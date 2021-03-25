@@ -16,11 +16,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class LocalDataModule {
-    @Provides
-    @Singleton
-    fun providesAppsRepository(@ApplicationContext appContext: Context, gson: Gson, database: LauncherDatabase): AppsRepository {
-        return AppsRepository(appContext, gson, database)
-    }
 
     @Provides
     @Singleton

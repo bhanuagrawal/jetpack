@@ -18,7 +18,6 @@ import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.reddit.model.Post;
 import agrawal.bhanu.jetpack.reddit.model.RedditFeed;
 
-@Singleton
 public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
 
     PostRepository postRepository;

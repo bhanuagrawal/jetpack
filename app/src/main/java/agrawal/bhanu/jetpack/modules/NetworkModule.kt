@@ -25,35 +25,6 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providesPostRepository(gson: Gson, uriBuilder: Uri.Builder, webService: WebService): PostRepository {
-        return PostRepository(gson, uriBuilder, webService)
-    }
-
-    @Provides
-    @Singleton
-    fun providesWebService( requestQueue: RequestQueue): WebService {
-        return WebService(requestQueue)
-    }
-
-    @Provides
-    @Singleton
-    fun providePostDataSourceFactory(provider: Provider<ItemKeyedPostDataSource>): PostDataSourceFactory {
-        return PostDataSourceFactory(provider)
-    }
-
-    @Provides
-    @Singleton
-    fun providesItemAdapter(application: Application?): ItemsAdapter {
-        return ItemsAdapter(application)
-    }
-
-    @Provides
-    fun providesItemKeyedPostDataSource(retryExecuter: Executor?, postRepository: PostRepository): ItemKeyedPostDataSource {
-        return ItemKeyedPostDataSource(retryExecuter, postRepository)
-    }
-
-    @Provides
-    @Singleton
     fun provideUrlBuilder(): Uri.Builder {
         return Uri.Builder()
     }

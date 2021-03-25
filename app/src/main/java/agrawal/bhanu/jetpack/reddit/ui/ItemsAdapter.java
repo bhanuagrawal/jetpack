@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import javax.inject.Inject;
+
 import agrawal.bhanu.jetpack.Constants;
 import agrawal.bhanu.jetpack.R;
 import agrawal.bhanu.jetpack.databinding.NetworkStateItemBinding;
@@ -25,6 +27,7 @@ import agrawal.bhanu.jetpack.databinding.RowItemBinding;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.reddit.model.Post;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
 public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder> {
 
@@ -32,7 +35,8 @@ public class ItemsAdapter extends PagedListAdapter<Post, RecyclerView.ViewHolder
     private NetworkState networkState;
     private RetryCallback retryCallback;
 
-    public ItemsAdapter(Context context) {
+    @Inject
+    public ItemsAdapter(@ApplicationContext  Context context) {
         super(Post.DIFF_CALLBACK);
         this.context = context;
     }

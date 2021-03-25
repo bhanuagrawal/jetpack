@@ -44,6 +44,7 @@ import agrawal.bhanu.jetpack.launcher.data.entities.WidgetsMetaData;
 import agrawal.bhanu.jetpack.launcher.data.entities.Widget;
 import agrawal.bhanu.jetpack.launcher.model.AppsInfo;
 import agrawal.bhanu.jetpack.launcher.util.callbacks.Callback;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
 public class AppsRepository {
@@ -54,7 +55,7 @@ public class AppsRepository {
     Context context;
 
     @Inject
-    public AppsRepository(Context context, Gson gson, LauncherDatabase database) {
+    public AppsRepository(@ApplicationContext Context context, Gson gson, LauncherDatabase database) {
         this.context = context;
         packageManager = context.getPackageManager();
         this.gson = gson;
