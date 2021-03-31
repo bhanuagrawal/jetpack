@@ -13,7 +13,8 @@ android {
         targetSdkVersion 30
         versionCode 3
         versionName "1.2"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunner 'agrawal.bhanu.jetpack.MainTestRunner'
+
     }
     buildTypes {
         release {
@@ -30,7 +31,16 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    kapt {
+        correctErrorTypes true
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
 }
+
 
 dependencies {
     def room_version = "1.1.1"
@@ -38,17 +48,15 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation files('lib/gson-extras-0.1.0.jar')
@@ -60,6 +68,15 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
     implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"
     androidTestImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 
+    kaptTest "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
+    testImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.3.0'
+    testImplementation "androidx.test.ext:junit:1.1.2"
+    testImplementation "org.robolectric:robolectric:4.2.1"
 }
+

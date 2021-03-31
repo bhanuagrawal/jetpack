@@ -34,9 +34,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providesGson(): Gson {
-        return Gson()
-    }
+    fun providesGson() = Gson()
 
     @Provides
     @Singleton

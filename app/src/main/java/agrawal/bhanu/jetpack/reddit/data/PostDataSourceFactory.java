@@ -14,16 +14,24 @@ import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.MyApp;
 import agrawal.bhanu.jetpack.reddit.model.Post;
+import dagger.hilt.EntryPoint;
+import dagger.hilt.EntryPoints;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ViewModelComponent;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.android.scopes.ViewModelScoped;
+import dagger.hilt.components.SingletonComponent;
 
-@Singleton
+@ViewModelScoped
 public class PostDataSourceFactory extends DataSource.Factory<String, Post> {
-    Provider<ItemKeyedPostDataSource> provider;
+
+    Context context;
     MutableLiveData<ItemKeyedPostDataSource> mutableLiveData;
 
     @Inject
-    public PostDataSourceFactory(Provider<ItemKeyedPostDataSource> provider) {
+    public PostDataSourceFactory(@ApplicationContext Context context) {
         this.mutableLiveData = new MutableLiveData<ItemKeyedPostDataSource>();
-        this.provider = provider;
+        this.context = context;
     }
 
     public LiveData<ItemKeyedPostDataSource> getMutableLiveData() {
@@ -32,12 +40,20 @@ public class PostDataSourceFactory extends DataSource.Factory<String, Post> {
 
     @Override
     public androidx.paging.DataSource create() {
-        ItemKeyedPostDataSource itemKeyedPostDataSource = provider.get();
+        ItemKeyedPostDataSource itemKeyedPostDataSource =
+                EntryPoints
+                        .get(context, PostDataSourceFactoryInterface.class)
+                        .getItemKeyedPostDataSource();
         mutableLiveData.postValue(itemKeyedPostDataSource);
         return itemKeyedPostDataSource;
     }
 
 
+    @EntryPoint
+    @InstallIn(SingletonComponent.class)
+    interface PostDataSourceFactoryInterface{
+        ItemKeyedPostDataSource getItemKeyedPostDataSource();
+    }
 
 
 }
