@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.WallpaperManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
@@ -22,8 +23,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providesRequestQueue(@ApplicationContext appContext: Context): RequestQueue {
-        return Volley.newRequestQueue(appContext)
+    fun provideUrlBuilder(): Uri.Builder {
+        return Uri.Builder()
     }
 
     @Provides

@@ -22,7 +22,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.android.scopes.ViewModelScoped;
 import dagger.hilt.components.SingletonComponent;
 
-@ViewModelScoped
+@Singleton
 public class PostDataSourceFactory extends DataSource.Factory<String, Post> {
 
     Context context;

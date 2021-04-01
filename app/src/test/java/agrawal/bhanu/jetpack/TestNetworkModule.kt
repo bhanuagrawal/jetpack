@@ -1,5 +1,6 @@
-package agrawal.bhanu.jetpack.modules
+package agrawal.bhanu.jetpack
 
+import agrawal.bhanu.jetpack.modules.NetworkModule
 import agrawal.bhanu.jetpack.network.WebService
 import agrawal.bhanu.jetpack.reddit.data.ItemKeyedPostDataSource
 import agrawal.bhanu.jetpack.reddit.data.PostDataSourceFactory
@@ -16,17 +17,21 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
+import org.mockito.Mockito.mock
 import java.util.concurrent.Executor
 import javax.inject.Provider
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
+@TestInstallIn(components = [SingletonComponent::class],
+    replaces = [NetworkModule::class]
+)
 @Module
-class NetworkModule {
+class TestNetworkModule {
 
     @Provides
     @Singleton
     fun providesRequestQueue(@ApplicationContext appContext: Context): RequestQueue {
-        return Volley.newRequestQueue(appContext)
+        return mock(RequestQueue::class.java)
     }
 }
