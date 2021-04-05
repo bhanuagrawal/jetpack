@@ -14,8 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.Executor
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @HiltAndroidTest
 class LauncherViewModelTest {
@@ -53,12 +51,12 @@ class LauncherViewModelTest {
     @Test
     fun appsGettingFetched(){
         runBlocking(Dispatchers.Main) {
-            val appsInfo = TestUtil.fetchLiveData<AppsInfo>(launcherViewModel.appsInfo,
-                waitTime = 5000,
-                isValid = {
-                    it?.apps?.isNullOrEmpty() == false
-                }
-            )
+            val appsInfo = TestUtil.fetchLiveData(
+                launcherViewModel.appsInfo,
+                waitTime = 5000
+            ) {
+                it?.apps?.isNullOrEmpty() == false
+            }
             assert((appsInfo as AppsInfo).apps.isNotEmpty())
         }
     }

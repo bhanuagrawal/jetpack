@@ -5,11 +5,9 @@ import agrawal.bhanu.jetpack.reddit.model.Post
 import agrawal.bhanu.jetpack.reddit.ui.RedditPostViewModel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.paging.PagedList
-import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,6 +39,18 @@ class RedditViewmodelTest {
 
     @Test
     fun assertPostFetchedFromNetwork(){
+
+        runBlocking{
+            val list = TestUtil.fetchLiveData(viewModel.postList!!){
+                it.isNullOrEmpty().not()
+            }
+
+            assert(list.isNullOrEmpty().not())
+        }
+    }
+
+    @Test
+    fun assertPostFetchedFromNetwork1(){
         runBlocking{
             var list: Any? = null
             viewModel.postList?.observeForever {

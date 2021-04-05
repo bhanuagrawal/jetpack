@@ -18,7 +18,7 @@ class RedditPostViewModel @Inject constructor(
         var postDataSourceFactory: PostDataSourceFactory
 ) : ViewModel() {
 
-    var postList: LiveData<PagedList<Post?>>? = null
+    var postList: LiveData<PagedList<Post>?>? = null
         get() {
             if (field == null) {
                 val pagedListConfig = PagedList.Config.Builder().setEnablePlaceholders(false)

@@ -11,6 +11,8 @@ buildscript {
         hiltVersion = '2.33-beta'
         lifecycleVersion = '2.2.0'
         coreTestingVersion = '2.1.0'
+        fragmentVersion = '1.3.2'
+        hiltAndroidXVersion = '1.0.0-alpha01'
 
     }
     
