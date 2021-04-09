@@ -25,6 +25,7 @@ import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.IdlingRegistry
 
 /**
  * launchFragmentInContainer from the androidx.fragment:fragment-testing library
@@ -53,6 +54,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     ).putExtra(THEME_EXTRAS_BUNDLE_KEY, themeResId)
 
     ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
+
          fragment= activity.supportFragmentManager.fragmentFactory.instantiate(
             Preconditions.checkNotNull(T::class.java.classLoader),
             T::class.java.name

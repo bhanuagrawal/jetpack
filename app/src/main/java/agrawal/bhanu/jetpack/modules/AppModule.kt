@@ -1,10 +1,14 @@
 package agrawal.bhanu.jetpack.modules
 
+import agrawal.bhanu.jetpack.SimpleIdlingResource
 import android.app.Application
 import android.app.WallpaperManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.annotation.NonNull
+import androidx.annotation.VisibleForTesting
+import androidx.test.espresso.IdlingResource
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
@@ -47,4 +51,12 @@ class AppModule {
     fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
         return appContext.getSharedPreferences("launcher", Context.MODE_PRIVATE)
     }
+
+
+    /**
+     * Only called from test, creates and returns a new [SimpleIdlingResource].
+     */
+    @Provides
+    @Singleton
+    fun provideIdlingResource(): SimpleIdlingResource = SimpleIdlingResource()
 }

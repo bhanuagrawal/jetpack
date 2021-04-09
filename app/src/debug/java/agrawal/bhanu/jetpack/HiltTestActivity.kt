@@ -24,9 +24,15 @@ import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolder
 import agrawal.bhanu.jetpack.launcher.ui.folder.AppsFolderDialogFragmnet
 import agrawal.bhanu.jetpack.reddit.ui.ItemsList
 import android.net.Uri
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.test.espresso.IdlingResource
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class HiltTestActivity : AppCompatActivity(),  ItemsList.OnFragmentInteractionListener,
@@ -36,6 +42,12 @@ Home.OnFragmentInteractionListener,
 DefaultPage.OnFragmentInteractionListener,
 AppsFolder.OnFragmentInteractionListener,
 AppsFolderDialogFragmnet.OnFragmentInteractionListener {
+
+
+    @Inject
+    lateinit var mIdlingResource: SimpleIdlingResource
+
+
     override fun onFragmentInteraction(uri: Uri?) {
     }
 

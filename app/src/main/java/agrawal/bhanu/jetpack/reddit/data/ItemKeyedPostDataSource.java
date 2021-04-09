@@ -3,6 +3,7 @@ import android.app.Application;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.ItemKeyedDataSource;
 import androidx.annotation.NonNull;
+import androidx.test.espresso.IdlingResource;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import agrawal.bhanu.jetpack.MyApp;
+import agrawal.bhanu.jetpack.SimpleIdlingResource;
 import agrawal.bhanu.jetpack.network.model.NetworkState;
 import agrawal.bhanu.jetpack.network.model.Status;
 import agrawal.bhanu.jetpack.reddit.model.Post;
@@ -34,6 +36,9 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
     public MutableLiveData getInitloading() {
         return initloading;
     }
+
+    @Inject
+    SimpleIdlingResource idlingResource;
 
     @Inject
     public ItemKeyedPostDataSource( Executor retryExecuter, PostRepository postRepository) {
@@ -58,12 +63,14 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
     public void loadInitial(@NonNull final LoadInitialParams<String> params, @NonNull final LoadInitialCallback<Post> callback) {
 
 
+        idlingResource.setIdleState(false);
         networkState.postValue(NetworkState.LOADING);
         initloading.postValue(NetworkState.LOADING);
         postRepository.fetchPosts(String.valueOf(params.requestedLoadSize), null,"10",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        idlingResource.setIdleState(true);
                         callback.onResult(((RedditFeed)postRepository.parsePostResponse(response)).getMetaData().getChildren());
                         networkState.postValue(NetworkState.LOADED);
                         initloading.postValue(NetworkState.LOADED);
@@ -71,6 +78,7 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        idlingResource.setIdleState(true);
                         networkState.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
                         initloading.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
                         retryTask = new Runnable() {
@@ -87,12 +95,13 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
 
     @Override
     public void loadAfter(@NonNull final LoadParams<String> params, @NonNull final LoadCallback<Post> callback) {
-
+        idlingResource.setIdleState(false);
         networkState.postValue(NetworkState.LOADING);
         postRepository.fetchPosts(String.valueOf(params.requestedLoadSize), String.valueOf(params.key),"10",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        idlingResource.setIdleState(true);
                         callback.onResult(((RedditFeed)postRepository.parsePostResponse(response)).getMetaData().getChildren());
                         networkState.postValue(NetworkState.LOADED);
                     }
@@ -100,6 +109,7 @@ public class ItemKeyedPostDataSource extends ItemKeyedDataSource<String, Post> {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        idlingResource.setIdleState(true);
                         networkState.postValue(new NetworkState(Status.FAILDED, error.getMessage()));
                         retryTask = new Runnable() {
                             @Override
